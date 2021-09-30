@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "PiratePuzzleGameModeBase.generated.h"
+#include "GamePlayMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PIRATEPUZZLE_API APiratePuzzleGameModeBase : public AGameModeBase
+class PIRATEPUZZLE_API AGamePlayMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	

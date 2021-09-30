@@ -8,4 +8,5 @@ rm -rf ./*.sln
 rm -rf ./.vs
 rm -rf Plugins/*/Binaries
 rm -rf Plugins/*/Intermediate
+rm -rf ./.idea
 
