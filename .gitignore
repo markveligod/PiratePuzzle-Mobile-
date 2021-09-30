@@ -1,0 +1,25 @@
+# IDE files
+/.vs
+/.idea
+/*.sln
+
+#Trash
+/DerivedDataCache/*
+/Intermediate/*
+/Saved/*
+/Binaries/*
+
+Plugins/*/Binaries/*
+Plugins/*/Intermediate/*
+
+# Built data for maps
+*_BuiltData.uasset
+
+# Build
+/Build/Android_ASTC
+/Build/Android_ETC2
+/Build/Android_Multi
+/Build/Android_DXT
+
+# Raw content
+/RawContent/**/* 
