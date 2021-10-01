@@ -28,6 +28,9 @@ public:
 
     // Set AI pirate
     void SetAIPirate(APirateAICharacter* Pirate) { this->AIPlayer = Pirate; }
+
+    // Run move ai character
+    void StartMoveAICharacterOnPos(FVector NewPos);
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;

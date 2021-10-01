@@ -45,6 +45,8 @@ ACameraPawn::ACameraPawn()
     this->BaseRotationPlayer.Add(EDirectionPlayer::Right, FInfoTrace(FRotator(0.f, 0.f, 0.f), FVector(-50.f, 0.f, 0.f)));
 }
 
+
+
 // Called when the game starts or when spawned
 void ACameraPawn::BeginPlay()
 {
@@ -77,7 +79,13 @@ void ACameraPawn::OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Locatio
         UE_LOG(LogCameraPawn, Error, TEXT("New point Location is zero: %s"), *NewPointLocation.ToString());
         return;
     }
-    
+    this->StartMoveAICharacterOnPos(NewPointLocation);
+}
+
+void ACameraPawn::StartMoveAICharacterOnPos(FVector NewPos)
+{
+    this->AIPlayer->SetNextLocation(NewPos);
+    this->AIPlayer->SetStateAI(EStateAI::Walk);
 }
 
 bool ACameraPawn::UpdateDirectionForPlayer()
