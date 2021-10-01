@@ -2,6 +2,8 @@
 
 
 #include "Game/Grid/GridGeneratorActor.h"
+
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -11,6 +13,9 @@
 #include "Game/Grid/GridNeutralPlatform.h"
 #include "Game/Grid/GridQuicksandPlatform.h"
 #include "Game/Grid/GridTreasurePlatform.h"
+#include "Game/AI/Pirate/PirateAICharacter.h"
+#include "Game/AI/Pirate/PirateAIController.h"
+#include "Game/Camera/CameraPawn.h"
 
 // Declaring a static variable for logging
 DEFINE_LOG_CATEGORY_STATIC(LogGridGeneratorActor, All, All);
@@ -36,6 +41,13 @@ void AGridGeneratorActor::BeginPlay()
     Super::BeginPlay();
     checkf(this->RootScene, TEXT("Root Scene component is nullptr"));
     checkf(this->StaticMeshHandleComponent, TEXT("Static Mesh Handle component is nullptr"));
+    this->ClearGrid();
+    if (this->SpawnNeutralPlatformRef && this->SpawnBarrierPlatformRef && this->SpawnQuicksandPlatformRef && this->SpawnTreasurePlatformRef)
+        this->SpawnPlatform();
+    if (this->SpawnWallRef)
+        this->SpawnWall();
+    if (this->SpawnPirateRef)
+        this->SpawnPirate();
 }
 
 void AGridGeneratorActor::OnConstruction(const FTransform& Transform)
@@ -46,6 +58,8 @@ void AGridGeneratorActor::OnConstruction(const FTransform& Transform)
         this->SpawnPlatform();
     if (this->SpawnWallRef)
         this->SpawnWall();
+    if (this->SpawnPirateRef)
+        this->SpawnPirate();
 }
 
 void AGridGeneratorActor::SpawnPlatform()
@@ -74,6 +88,7 @@ void AGridGeneratorActor::SpawnPlatform()
             // Finish spawn on grid
             TempPlatform->FinishSpawning(SpawnTransform);
             this->MapPlatformsOnGrid.Add(TempPoint, TempPlatform);
+            UE_LOG(LogGridGeneratorActor, Display, TEXT("Platform: %s spawned on position: %s"), *TempPlatform->GetName(), *TempPoint.ToString());
         }
     }
 }
@@ -135,21 +150,46 @@ void AGridGeneratorActor::SpawnWall()
     auto FirstWidthWallRef = GetWorld()->SpawnActor<AGridWallActor>(this->SpawnWallRef, SpawnLocationWidth, FRotator::ZeroRotator, Params);
     FirstWidthWallRef->WallBox->SetBoxExtent(SizeExtWallWidth);
     this->WallsGrid.Add(FirstWidthWallRef);
+    UE_LOG(LogGridGeneratorActor, Display, TEXT("Wall: %s spawned"), *FirstWidthWallRef->GetName());
 
     SpawnLocationHeight.X -= this->DistancePlatform / 2;
     auto FirstHeightWallRef = GetWorld()->SpawnActor<AGridWallActor>(this->SpawnWallRef, SpawnLocationHeight, FRotator(0, -90, 0), Params);
     FirstHeightWallRef->WallBox->SetBoxExtent(SizeExtWallHeight);
     this->WallsGrid.Add(FirstHeightWallRef);
-
+    UE_LOG(LogGridGeneratorActor, Display, TEXT("Wall: %s spawned"), *FirstHeightWallRef->GetName());
+    
     SpawnLocationWidth.Y += this->DistancePlatform * this->HeightCount;
     auto SecondWidthWallRef = GetWorld()->SpawnActor<AGridWallActor>(this->SpawnWallRef, SpawnLocationWidth, FRotator::ZeroRotator, Params);
     SecondWidthWallRef->WallBox->SetBoxExtent(SizeExtWallWidth);
     this->WallsGrid.Add(SecondWidthWallRef);
+    UE_LOG(LogGridGeneratorActor, Display, TEXT("Wall: %s spawned"), *SecondWidthWallRef->GetName());
 
     SpawnLocationHeight.X += this->DistancePlatform * this->WidthCount;
     auto SecondHeightWallRef = GetWorld()->SpawnActor<AGridWallActor>(this->SpawnWallRef, SpawnLocationHeight, FRotator(0, -90, 0), Params);
     SecondHeightWallRef->WallBox->SetBoxExtent(SizeExtWallHeight);
     this->WallsGrid.Add(SecondHeightWallRef);
+    UE_LOG(LogGridGeneratorActor, Display, TEXT("Wall: %s spawned"), *SecondHeightWallRef->GetName());
+}
+
+void AGridGeneratorActor::SpawnPirate()
+{
+    if (this->MapPlatformsOnGrid.Contains(PosPirate))
+    {
+        const auto TempPlatform = this->MapPlatformsOnGrid[PosPirate];
+        FVector SpawnPos = TempPlatform->GetActorLocation();
+        SpawnPos.Z += this->AddPiratePosZ;
+        
+        FRotator TempRot = FRotator(0.f, this->PirateRotZ, 0.f);
+
+        this->AIPirate = Cast<APirateAICharacter>(UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), this->SpawnPirateRef, nullptr, SpawnPos, TempRot));
+        if(!this->AIPirate) return;
+        UE_LOG(LogGridGeneratorActor, Display, TEXT("AI pirate: %s spawned"), *this->AIPirate->GetName());
+
+        auto CameraBase = Cast<ACameraPawn>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraPawn::StaticClass()));
+        if (!CameraBase) return;
+
+        CameraBase->SetAIPirate(this->AIPirate);
+    }
 }
 
 void AGridGeneratorActor::ClearGrid()
@@ -167,4 +207,17 @@ void AGridGeneratorActor::ClearGrid()
     for (auto TempWall : ArrayWall)
         TempWall->Destroy();
     this->WallsGrid.Empty();
+
+    // Pirate
+    TArray<APirateAICharacter*> ArrayPirate;
+    BaseUtils::FillArrayActorOfClass<APirateAICharacter>(GetWorld(), this->SpawnPirateRef, ArrayPirate);
+    for (auto TempPirate : ArrayPirate)
+        TempPirate->Destroy();
+    this->AIPirate = nullptr;
+
+    TArray<APirateAIController*> ArrayController;
+    BaseUtils::FillArrayActorOfClass<APirateAIController>(GetWorld(), APirateAIController::StaticClass(), ArrayController);
+    for (auto TempController : ArrayController)
+        TempController->Destroy();
+    
 }

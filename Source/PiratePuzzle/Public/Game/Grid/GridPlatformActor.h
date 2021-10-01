@@ -11,18 +11,21 @@ class UTextRenderComponent;
 UCLASS()
 class PIRATEPUZZLE_API AGridPlatformActor : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AGridPlatformActor();
+    GENERATED_BODY()
+
+public:
+    // Sets default values for this actor's properties
+    AGridPlatformActor();
 
     // Called every frame
     virtual void Tick(float DeltaTime) override;
-    
+
+    // Getting position platform
+    FIntPoint GetPositionPlatform() const { return (this->PlatformPos); }
+
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
 private:
     // Main scene root components
@@ -37,7 +40,7 @@ private:
 
     // Current Position on grid generator
     UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-    FVector2D PlatformPos = FVector2D(-1, -1);
+    FIntPoint PlatformPos = FIntPoint(-1, -1);
 
     friend class AGridGeneratorActor;
 };

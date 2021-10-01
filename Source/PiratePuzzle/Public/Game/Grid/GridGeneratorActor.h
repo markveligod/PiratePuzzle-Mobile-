@@ -12,6 +12,7 @@ class AGridNeutralPlatform;
 class AGridBarrierPlatform;
 class AGridWallActor;
 class AGridPlatformActor;
+class APirateAICharacter;
 UCLASS()
 class PIRATEPUZZLE_API AGridGeneratorActor : public AActor
 {
@@ -20,7 +21,7 @@ class PIRATEPUZZLE_API AGridGeneratorActor : public AActor
 public:
     // Sets default values for this actor's properties
     AGridGeneratorActor();
-
+    
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
@@ -98,6 +99,29 @@ private:
     // Array pointer spawn wall on grid
     TArray<AGridWallActor*> WallsGrid;
 
+    /*
+     * Part Settings for AI player
+     */
+    // Pirate pointer ref
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Pirate pointer ref"))
+    TSubclassOf<APirateAICharacter> SpawnPirateRef;
+    // Treasure point position for Spawn on platform
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Pirate point position for Spawn on platform"))
+    FIntPoint PosPirate;
+    // Adds along the Z axis when a pirate spawns
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Adds along the Z axis when a pirate spawns"))
+    float AddPiratePosZ = 50.f;
+    // The angle of rotation when spawning a pirate
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
+        meta = (AllowPrivateAccess = "true", ToolTip = "The angle of rotation when spawning a pirate"))
+    float PirateRotZ = 0.f;
+    // Pointer on pirate
+    APirateAICharacter* AIPirate;
+
+    
     
     // Spawn platform on Grid
     void SpawnPlatform();
@@ -107,6 +131,9 @@ private:
 
     // Spawn Wall on Grid
     void SpawnWall();
+
+    // Spawn pirate on Grid
+    void SpawnPirate();
     
     // Clear grid
     void ClearGrid();
