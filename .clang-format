@@ -1,18 +1,44 @@
+---
 Language: Cpp
 BasedOnStyle: Microsoft
-IndentWidth: '4'
-UseTab: Never
-TabWidth: '4'
-BreakBeforeBraces: Allman
-ColumnLimit: '140'
-AccessModifierOffset: '-4'
-SortIncludes: false
-AllowShortBlocksOnASingleLine: false
+AccessModifierOffset: -4
 AlignAfterOpenBracket: DontAlign
-AllowShortFunctionsOnASingleLine: Inline
-PointerAlignment: Left
-AllowShortIfStatementsOnASingleLine: true
-SpacesBeforeTrailingComments: 2
+AlignOperands: true
+AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: true
-IndentCaseLabels: true
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: true
 AlwaysBreakTemplateDeclarations: Yes
+BraceWrapping: 
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: true
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+ColumnLimit: 140
+IncludeCategories: 
+  - Regex: '^<.*'
+    Priority: 1
+  - Regex: '^".*'
+    Priority: 2
+  - Regex: '.*'
+    Priority: 3
+IncludeIsMainRegex: '([-_](test|unittest))?$'
+IndentCaseLabels: true
+MacroBlockBegin: ''
+MacroBlockEnd: ''
+PointerAlignment: Left
+SortIncludes: false
+...

@@ -1,11 +1,11 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
 
-#include "Game/Grid/GridItemActor.h"
+#include "Game/Grid/GridPlatformActor.h"
 #include "Components/TextRenderComponent.h"
 
 // Sets default values
-AGridItemActor::AGridItemActor()
+AGridPlatformActor::AGridPlatformActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -23,14 +23,13 @@ AGridItemActor::AGridItemActor()
 }
 
 // Called when the game starts or when spawned
-void AGridItemActor::BeginPlay()
+void AGridPlatformActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
-void AGridItemActor::Tick(float DeltaTime)
+void AGridPlatformActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

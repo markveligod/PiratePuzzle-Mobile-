@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GridItemActor.generated.h"
+#include "GridPlatformActor.generated.h"
 
 class UTextRenderComponent;
 UCLASS()
-class PIRATEPUZZLE_API AGridItemActor : public AActor
+class PIRATEPUZZLE_API AGridPlatformActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AGridItemActor();
+	AGridPlatformActor();
 
     // Called every frame
     virtual void Tick(float DeltaTime) override;
@@ -34,8 +34,9 @@ private:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UTextRenderComponent* TextDebugPosition;
 
-    // Current Position
-    FVector2D ItemPos = FVector2D(-1, -1);
+    // Current Position on grid generator
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    FVector2D PlatformPos = FVector2D(-1, -1);
 
     friend class AGridGeneratorActor;
 };
