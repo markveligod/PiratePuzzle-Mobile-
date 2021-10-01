@@ -9,6 +9,8 @@
 #include "Game/Grid/GridWallActor.h"
 #include "Game/Grid/GridBarrierPlatform.h"
 #include "Game/Grid/GridNeutralPlatform.h"
+#include "Game/Grid/GridQuicksandPlatform.h"
+#include "Game/Grid/GridTreasurePlatform.h"
 
 // Declaring a static variable for logging
 DEFINE_LOG_CATEGORY_STATIC(LogGridGeneratorActor, All, All);
@@ -40,7 +42,7 @@ void AGridGeneratorActor::OnConstruction(const FTransform& Transform)
 {
     Super::OnConstruction(Transform);
     this->ClearGrid();
-    if (this->SpawnNeutralPlatformRef && this->SpawnBarrierPlatformRef)
+    if (this->SpawnNeutralPlatformRef && this->SpawnBarrierPlatformRef && this->SpawnQuicksandPlatformRef && this->SpawnTreasurePlatformRef)
         this->SpawnPlatform();
     if (this->SpawnWallRef)
         this->SpawnWall();
@@ -80,6 +82,10 @@ AGridPlatformActor* AGridGeneratorActor::SpawnSpecificPlatform(FIntPoint Point, 
 {
     if (this->ArrayPosBarrier.Contains(Point))
         return (GetWorld()->SpawnActorDeferred<AGridPlatformActor>(this->SpawnBarrierPlatformRef, SpawnTransform));
+    else if (this->ArrayPosQuicksand.Contains(Point))
+        return (GetWorld()->SpawnActorDeferred<AGridPlatformActor>(this->SpawnQuicksandPlatformRef, SpawnTransform));
+    else if (this->PosTreasure == Point)
+         return (GetWorld()->SpawnActorDeferred<AGridPlatformActor>(this->SpawnTreasurePlatformRef, SpawnTransform));
     return (GetWorld()->SpawnActorDeferred<AGridPlatformActor>(this->SpawnNeutralPlatformRef, SpawnTransform));
 }
 

@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "GridGeneratorActor.generated.h"
 
+class AGridTreasurePlatform;
+class AGridQuicksandPlatform;
 class AGridNeutralPlatform;
 class AGridBarrierPlatform;
 class AGridWallActor;
@@ -57,13 +59,30 @@ private:
     
     // Barrier pointer ref
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform|State Barrier",
-        meta = (AllowPrivateAccess = "true", ToolTip = "Barrier material for setup on platform"))
+        meta = (AllowPrivateAccess = "true", ToolTip = "Barrier pointer ref"))
     TSubclassOf<AGridBarrierPlatform> SpawnBarrierPlatformRef;
     // Barrier point position for Spawn on platform
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform|State Barrier",
         meta = (AllowPrivateAccess = "true", ToolTip = "Barrier point position for Spawn on platform"))
     TArray<FIntPoint> ArrayPosBarrier;
 
+    // Quicksand pointer ref
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform|State Quicksand",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Quicksand pointer ref"))
+    TSubclassOf<AGridQuicksandPlatform> SpawnQuicksandPlatformRef;
+    // Quicksand point position for Spawn on platform
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform|State Quicksand",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Quicksand point position for Spawn on platform"))
+    TArray<FIntPoint> ArrayPosQuicksand;
+    
+    // Treasure pointer ref
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform|State Treasure",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Treasure pointer ref"))
+    TSubclassOf<AGridTreasurePlatform> SpawnTreasurePlatformRef;
+    // Treasure point position for Spawn on platform
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform|State Treasure",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Treasure point position for Spawn on platform"))
+    FIntPoint PosTreasure;
 
     /*
      * Part Settings Spawn Wall on Grid
