@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Game/Grid/GridDataTypes.h"
 #include "GridPlatformActor.generated.h"
 
 class UTextRenderComponent;

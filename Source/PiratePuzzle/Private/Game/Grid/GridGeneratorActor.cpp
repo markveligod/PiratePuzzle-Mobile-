@@ -2,12 +2,13 @@
 
 
 #include "Game/Grid/GridGeneratorActor.h"
-
 #include "Components/BoxComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "UtilsLib/BaseUtils.h"
 #include "Game/Grid/GridWallActor.h"
+#include "Game/Grid/GridBarrierPlatform.h"
+#include "Game/Grid/GridNeutralPlatform.h"
 
 // Declaring a static variable for logging
 DEFINE_LOG_CATEGORY_STATIC(LogGridGeneratorActor, All, All);
@@ -39,7 +40,7 @@ void AGridGeneratorActor::OnConstruction(const FTransform& Transform)
 {
     Super::OnConstruction(Transform);
     this->ClearGrid();
-    if (this->SpawnPlatformRef)
+    if (this->SpawnNeutralPlatformRef && this->SpawnBarrierPlatformRef)
         this->SpawnPlatform();
     if (this->SpawnWallRef)
         this->SpawnWall();
@@ -50,7 +51,7 @@ void AGridGeneratorActor::SpawnPlatform()
     for (int32 i = 0; i < this->HeightCount; i++)
     {
         int32 j = 0;
-        FVector ZeroWidthPosition = (j == 0) ? GetActorLocation() : BaseUtils::GetZeroPositionOnGrid(i, this->MapPlatformsOnGrid);
+        const FVector ZeroWidthPosition = (j == 0) ? GetActorLocation() : BaseUtils::GetZeroPositionOnGrid(i, this->MapPlatformsOnGrid);
         for (j; j < this->WidthCount; j++)
         {
             FIntPoint TempPoint(j, i);
@@ -58,7 +59,7 @@ void AGridGeneratorActor::SpawnPlatform()
                 ZeroWidthPosition.Y + (this->DistancePlatform * i), ZeroWidthPosition.Z);
             FTransform SpawnTransform(NewLocation);
 
-            AGridPlatformActor* TempPlatform = GetWorld()->SpawnActorDeferred<AGridPlatformActor>(this->SpawnPlatformRef, SpawnTransform);
+            AGridPlatformActor* TempPlatform = this->SpawnSpecificPlatform(TempPoint, SpawnTransform);
             if (!TempPlatform)
             {
                 UE_LOG(LogGridGeneratorActor, Error, TEXT("Spawn error on pos: %s"), *TempPoint.ToString());
@@ -73,6 +74,13 @@ void AGridGeneratorActor::SpawnPlatform()
             this->MapPlatformsOnGrid.Add(TempPoint, TempPlatform);
         }
     }
+}
+
+AGridPlatformActor* AGridGeneratorActor::SpawnSpecificPlatform(FIntPoint Point, FTransform SpawnTransform)
+{
+    if (this->ArrayPosBarrier.Contains(Point))
+        return (GetWorld()->SpawnActorDeferred<AGridPlatformActor>(this->SpawnBarrierPlatformRef, SpawnTransform));
+    return (GetWorld()->SpawnActorDeferred<AGridPlatformActor>(this->SpawnNeutralPlatformRef, SpawnTransform));
 }
 
 void AGridGeneratorActor::SpawnWall()
@@ -142,7 +150,7 @@ void AGridGeneratorActor::ClearGrid()
 {
     // Platform
     TArray<AGridPlatformActor*> ArrayPlatform;
-    BaseUtils::FillArrayActorOfClass<AGridPlatformActor>(GetWorld(), this->SpawnPlatformRef, ArrayPlatform);
+    BaseUtils::FillArrayActorOfClass<AGridPlatformActor>(GetWorld(), AGridPlatformActor::StaticClass(), ArrayPlatform);
     for (auto TempPlatfrom : ArrayPlatform)
         TempPlatfrom->Destroy();
     this->MapPlatformsOnGrid.Empty();

@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "GridGeneratorActor.generated.h"
 
+class AGridNeutralPlatform;
+class AGridBarrierPlatform;
 class AGridWallActor;
 class AGridPlatformActor;
 UCLASS()
@@ -38,7 +40,7 @@ private:
     // Reference for mesh spawning
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform",
         meta = (AllowPrivateAccess = "true", ToolTip = "Reference for mesh spawning"))
-    TSubclassOf<AGridPlatformActor> SpawnPlatformRef;
+    TSubclassOf<AGridNeutralPlatform> SpawnNeutralPlatformRef;
     // Size grid
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform",
         meta = (AllowPrivateAccess = "true", ToolTip = "WidthCount"))
@@ -52,6 +54,16 @@ private:
     float DistancePlatform = 100.f;
     // Map Point and pointer spawn item on grid
     TMap<FIntPoint, AGridPlatformActor*> MapPlatformsOnGrid;
+    
+    // Barrier pointer ref
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform|State Barrier",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Barrier material for setup on platform"))
+    TSubclassOf<AGridBarrierPlatform> SpawnBarrierPlatformRef;
+    // Barrier point position for Spawn on platform
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform|State Barrier",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Barrier point position for Spawn on platform"))
+    TArray<FIntPoint> ArrayPosBarrier;
+
 
     /*
      * Part Settings Spawn Wall on Grid
@@ -70,6 +82,9 @@ private:
     
     // Spawn platform on Grid
     void SpawnPlatform();
+
+    // Checking for a specific platform's spawn
+    AGridPlatformActor* SpawnSpecificPlatform(FIntPoint Point, FTransform SpawnTransform);
 
     // Spawn Wall on Grid
     void SpawnWall();
