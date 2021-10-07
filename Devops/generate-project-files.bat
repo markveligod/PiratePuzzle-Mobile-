@@ -1,7 +1,7 @@
 @echo off
 ECHO Options Params
 SET VersionSelector=d:\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe
-SET ProjectName=NewPiratePuzzle.uproject
+SET ProjectName=PiratePuzzle.uproject
 SET ProjectPath=%CD%\..\%ProjectName%
 SET EnginePath=d:\UE_4.26
 SET UBTRelativePath=Engine\Binaries\DotNET\UnrealBuildTool.exe

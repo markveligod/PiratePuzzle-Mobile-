@@ -1,6 +1,5 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
-
 #include "Game/Camera/CameraPawn.h"
 
 #include "DrawDebugHelpers.h"
@@ -18,8 +17,8 @@ DEFINE_LOG_CATEGORY_STATIC(LogCameraPawn, All, All);
 // Sets default values
 ACameraPawn::ACameraPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    // Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = true;
     // Create root scene component
     this->SceneRootComponent = CreateDefaultSubobject<USceneComponent>("Root Scene Component");
     SetRootComponent(this->SceneRootComponent);
@@ -45,17 +44,14 @@ ACameraPawn::ACameraPawn()
     this->BaseRotationPlayer.Add(EDirectionPlayer::Right, FInfoTrace(FRotator(0.f, 0.f, 0.f), FVector(-50.f, 0.f, 0.f)));
 }
 
-
-
 // Called when the game starts or when spawned
 void ACameraPawn::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
     checkf(this->SceneRootComponent, TEXT("Scene root component is nullptr"));
     checkf(this->SpringArmComponent, TEXT("Spring arm component is nullptr"));
     checkf(this->CameraComponent, TEXT("Camera component is nullptr"));
     checkf(this->SphereComponent, TEXT("Sphere component is nullptr"));
-
 }
 
 void ACameraPawn::OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location)
@@ -70,7 +66,7 @@ void ACameraPawn::OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Locatio
     this->EndTouch.Y = Location.Y;
 
     if (!this->AIPlayer) return;
-    
+    if (this->AIPlayer->GetStateAI() != EStateAI::Idle) return;
     if (!this->UpdateDirectionForPlayer()) return;
 
     FVector NewPointLocation;
@@ -92,7 +88,8 @@ bool ACameraPawn::UpdateDirectionForPlayer()
 {
     const auto NoAbsVector = FVector2D(this->StartTouch.X - this->EndTouch.X, this->StartTouch.Y - this->EndTouch.Y);
     const auto AbsVector = FVector2D(FMath::Abs(this->StartTouch.X - this->EndTouch.X), FMath::Abs(this->StartTouch.Y - this->EndTouch.Y));
-    const auto LengthRegister = UKismetMathLibrary::VSize2D(FVector2D(this->EndTouch.X - this->StartTouch.X, this->EndTouch.Y - this->StartTouch.Y));
+    const auto LengthRegister =
+        UKismetMathLibrary::VSize2D(FVector2D(this->EndTouch.X - this->StartTouch.X, this->EndTouch.Y - this->StartTouch.Y));
 
     if (LengthRegister < this->LenSizeTouch)
     {
@@ -116,49 +113,49 @@ FVector ACameraPawn::TryFindNewPointLocation()
 {
     FVector StartLine = this->AIPlayer->GetCapsuleComponent()->GetComponentLocation();
     FVector EndLine = StartLine + this->BaseRotationPlayer[this->DirectionPlayer].RotationPlayer.Vector() * this->DistanceTrace;
-    
+
     FCollisionQueryParams FirstParams(FName(TEXT("param")), false, GetOwner());
     FCollisionObjectQueryParams FirstObjectParams(ECollisionChannel::ECC_WorldStatic);
-    
+
     FHitResult FirstTrace = this->TryGetTrace(StartLine, EndLine, FirstParams, FirstObjectParams);
     if (FirstTrace.IsValidBlockingHit() && FirstTrace.GetActor())
     {
         const auto TempActor = FirstTrace.GetActor();
         UE_LOG(LogCameraPawn, Display, TEXT("Wall is actor: %s"), *TempActor->GetName());
-    
+
         FVector BlockLocationStart = FirstTrace.ImpactPoint;
         BlockLocationStart += this->BaseRotationPlayer[this->DirectionPlayer].TraceLocation;
         FVector BlockLocationEnd = BlockLocationStart + (FRotator(-90.f, 0.f, 0.f)).Vector() * this->DistanceTrace;
-    
+
         FCollisionQueryParams SecondParams(FName(TEXT("param")), false, GetOwner());
         FCollisionObjectQueryParams SecondObjectParams(ECollisionChannel::ECC_OverlapAll_Deprecated);
-    
+
         FHitResult SecondTrace = this->TryGetTrace(BlockLocationStart, BlockLocationEnd, SecondParams, SecondObjectParams);
         if (SecondTrace.IsValidBlockingHit() && SecondTrace.GetActor())
         {
             const auto TempSecondActor = SecondTrace.GetActor();
             UE_LOG(LogCameraPawn, Display, TEXT("Block item is actor: %s"), *TempSecondActor->GetName());
-    
+
             const auto TempPlatform = Cast<AGridPlatformActor>(TempSecondActor);
             if (!TempPlatform) return (FVector::ZeroVector);
-    
+
             const FIntPoint TempPosPlatform = TempPlatform->GetPositionPlatform();
             const FIntPoint TempPosAICharacter = this->AIPlayer->GetPosPlayer();
-    
+
             if (TempPosPlatform == TempPosAICharacter) return (FVector::ZeroVector);
-    
+
             this->AIPlayer->SetNewPosPlayer(TempPosPlatform);
             UE_LOG(LogCameraPawn, Display, TEXT("New Position AI player: %s"), *TempPosPlatform.ToString());
             FVector ResVec = TempSecondActor->GetActorLocation();
-    
+            ResVec.Z += 100.f;
             return (ResVec);
         }
     }
     return (FVector::ZeroVector);
 }
 
-FHitResult ACameraPawn::TryGetTrace(FVector StartPos, FVector EndPos, FCollisionQueryParams Params,
-    FCollisionObjectQueryParams ObjectParams)
+FHitResult ACameraPawn::TryGetTrace(
+    FVector StartPos, FVector EndPos, FCollisionQueryParams Params, FCollisionObjectQueryParams ObjectParams)
 {
     FHitResult HitResult;
 
@@ -170,18 +167,16 @@ FHitResult ACameraPawn::TryGetTrace(FVector StartPos, FVector EndPos, FCollision
 // Called every frame
 void ACameraPawn::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
+    Super::Tick(DeltaTime);
 }
 
 // Called to bind functionality to input
 void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
     if (PlayerInputComponent)
     {
         PlayerInputComponent->BindTouch(IE_Pressed, this, &ACameraPawn::OnTouchPressed);
         PlayerInputComponent->BindTouch(IE_Released, this, &ACameraPawn::OnTouchReleased);
     }
 }
-
