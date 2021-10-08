@@ -19,5 +19,7 @@ public:
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
     FBlackboardKeySelector NewLocation;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+    TSubclassOf<ACharacter> SetCharacter;
     virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };

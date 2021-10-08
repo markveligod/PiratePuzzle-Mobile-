@@ -9,7 +9,7 @@
 class ACameraPawn;
 class AGridGeneratorActor;
 /**
- * 
+ *
  */
 UCLASS()
 class PIRATEPUZZLE_API AGamePlayMode : public AGameModeBase
@@ -19,8 +19,12 @@ class PIRATEPUZZLE_API AGamePlayMode : public AGameModeBase
 public:
     AGamePlayMode();
 
+    // Getting pointer on grid generator
+    AGridGeneratorActor* GetGridGenerator() { return (this->GridGeneratorPlatform); }
+
 protected:
     virtual void StartPlay() override;
+
 private:
     AGridGeneratorActor* GridGeneratorPlatform;
     ACameraPawn* CameraPawn;

@@ -6,6 +6,7 @@
 #include "Game/HUD/DebugHUD.h"
 #include "GameHUD.generated.h"
 
+class AGamePlayMode;
 class UBaseUserWidget;
 /**
  *
@@ -22,6 +23,9 @@ protected:
     virtual void BeginPlay() override;
 
 private:
+    // Game mode pointer
+    AGamePlayMode* GameMode = nullptr;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI",
         meta = (AllowPrivateAccess = "true", ToolTip = "Game widget UI from UBaseUserWidget"))
     TSubclassOf<UBaseUserWidget> GameWidgetClass;

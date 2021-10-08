@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Game/AI/Pirate/PirateDataTypes.h"
+#include "Game/AI/AIDataTypes.h"
 #include "PirateAICharacter.generated.h"
 
 class UBehaviorTree;
