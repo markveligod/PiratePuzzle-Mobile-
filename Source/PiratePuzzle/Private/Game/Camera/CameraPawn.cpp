@@ -126,7 +126,13 @@ FVector ACameraPawn::TryFindNewPointLocation()
         FVector BlockLocationStart = FirstTrace.ImpactPoint;
         BlockLocationStart += this->BaseRotationPlayer[this->DirectionPlayer].TraceLocation;
         FVector BlockLocationEnd = BlockLocationStart + (FRotator(-90.f, 0.f, 0.f)).Vector() * this->DistanceTrace;
-
+        // Draw debug trace
+        if (this->bEnableDebugTrace)
+        {
+            DrawDebugLine(GetWorld(), StartLine, BlockLocationStart, this->ColorTrace, false, this->TimeLifeTrace, 0, this->ThicknessTrace);
+            DrawDebugSphere(GetWorld(), BlockLocationStart, this->RadiusSphere, this->SegmentsSphere, this->ColorTrace, false,
+                this->TimeLifeTrace, 0, this->ThicknessTrace);
+        }
         FCollisionQueryParams SecondParams(FName(TEXT("param")), false, GetOwner());
         FCollisionObjectQueryParams SecondObjectParams(ECollisionChannel::ECC_OverlapAll_Deprecated);
 
@@ -135,6 +141,14 @@ FVector ACameraPawn::TryFindNewPointLocation()
         {
             const auto TempSecondActor = SecondTrace.GetActor();
             UE_LOG(LogCameraPawn, Display, TEXT("Block item is actor: %s"), *TempSecondActor->GetName());
+            // Draw debug trace
+            if (this->bEnableDebugTrace)
+            {
+                DrawDebugLine(GetWorld(), BlockLocationStart, SecondTrace.ImpactPoint, this->ColorTrace, false, this->TimeLifeTrace, 0,
+                    this->ThicknessTrace);
+                DrawDebugSphere(GetWorld(), SecondTrace.ImpactPoint, this->RadiusSphere, this->SegmentsSphere, this->ColorTrace, false,
+                    this->TimeLifeTrace, 0, this->ThicknessTrace);
+            }
 
             const auto TempPlatform = Cast<AGridPlatformActor>(TempSecondActor);
             if (!TempPlatform) return (FVector::ZeroVector);
@@ -160,7 +174,6 @@ FHitResult ACameraPawn::TryGetTrace(
     FHitResult HitResult;
 
     GetWorld()->LineTraceSingleByObjectType(HitResult, StartPos, EndPos, ObjectParams, Params);
-    DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::MakeRandomColor(), false, 5.f, 0, 2.f);
     return (HitResult);
 }
 

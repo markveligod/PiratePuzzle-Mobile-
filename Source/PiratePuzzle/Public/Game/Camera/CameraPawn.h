@@ -31,10 +31,10 @@ public:
 
     // Run move ai character
     void StartMoveAICharacterOnPos(FVector NewPos);
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
-
 
 private:
     // root Scene component
@@ -70,6 +70,34 @@ private:
     // Pointer ai player for controlled
     APirateAICharacter* AIPlayer;
 
+    /*
+     * Debug line trace from pirate
+     */
+    // Enable debug rendering of pirate movement lines.
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Debug Trace",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Enable debug rendering of pirate movement lines."))
+    bool bEnableDebugTrace = true;
+    // Color debug trace
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Debug Trace",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Color debug trace.", EditCondition = "bEnableDebugTrace"))
+    FColor ColorTrace = FColor::Red;
+    // Life time debug trace
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Debug Trace",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Life time debug trace.", EditCondition = "bEnableDebugTrace"))
+    float TimeLifeTrace = 5.f;
+    // Thickness debug trace
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Debug Trace",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Thickness debug trace.", EditCondition = "bEnableDebugTrace"))
+    float ThicknessTrace = 5.f;
+    // Radius debug sphere
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Debug Trace",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Radius debug sphere.", EditCondition = "bEnableDebugTrace"))
+    float RadiusSphere = 5.f;
+    // Segments debug sphere
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Debug Trace",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Segments debug sphere.", EditCondition = "bEnableDebugTrace"))
+    int32 SegmentsSphere = 5.f;
+
     // Pack function for register touch of the finger
     void OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location);
     void OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Location);
@@ -80,4 +108,6 @@ private:
     FVector TryFindNewPointLocation();
     // TryGetTrace
     FHitResult TryGetTrace(FVector StartPos, FVector EndPos, FCollisionQueryParams Params, FCollisionObjectQueryParams ObjectParams);
+
+    friend class AGameHUD;
 };
