@@ -32,7 +32,10 @@ public:
     UWidgetAnimation* GetEndAnim() const { return (this->EndAnim); }
 
     // Enable button active
-    void EnableButtonActive() const {}
+    void EnableButtonActive() { this->bIsButtonActive = true; }
+    void DisableButtonActive() { this->bIsButtonActive = false; }
+    // State Active button
+    bool GetStateActiveButton() const { return (this->bIsButtonActive); }
 
 protected:
     // required animations for all child classes Start and End animation
@@ -49,10 +52,10 @@ protected:
     // Getting Current Game mode
     AGamePlayMode* GetGamePlayMode() const { return (this->GamePlayMode); }
 
+private:
     // State Activided buttons
     bool bIsButtonActive = true;
 
-private:
     // Timer to play the animation at a given time
     FTimerHandle TimerDelayCallBack;
 

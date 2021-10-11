@@ -98,5 +98,6 @@ void AGameHUD::ChangeOnNewWidget(EGameState NewState)
 
     this->WidgetOnVisible = this->GameWidgets[NewState];
     this->WidgetOnVisible->SetVisibility(ESlateVisibility::Visible);
+    this->WidgetOnVisible->EnableButtonActive();
     this->WidgetOnVisible->ShowAnim(this->WidgetOnVisible->GetStartAnim());
 }

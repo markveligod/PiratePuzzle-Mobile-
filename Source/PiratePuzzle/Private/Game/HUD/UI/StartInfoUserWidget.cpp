@@ -12,8 +12,8 @@ void UStartInfoUserWidget::NativeOnInitialized()
 
 void UStartInfoUserWidget::CloseWidget()
 {
-    if (!bIsButtonActive) return;
+    if (!GetStateActiveButton()) return;
     ShowAnim(this->CloseButtonAnim);
     ChangeGameStateTimer(EGameState::GameProgress, this->DelayCloseButton);
-    this->bIsButtonActive = false;
+    DisableButtonActive();
 }

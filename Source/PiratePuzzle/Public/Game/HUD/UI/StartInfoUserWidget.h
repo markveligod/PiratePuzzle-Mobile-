@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <ThirdParty/CryptoPP/5.6.5/include/asn.h>
-
 #include "CoreMinimal.h"
 #include "Game/HUD/UI/BaseUserWidget.h"
 #include "StartInfoUserWidget.generated.h"
