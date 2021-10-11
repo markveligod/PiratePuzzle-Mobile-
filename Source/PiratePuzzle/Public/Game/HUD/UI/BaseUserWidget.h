@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Game/GameDataTypes.h"
 #include "BaseUserWidget.generated.h"
 
 class AGamePlayMode;
@@ -17,6 +18,7 @@ class PIRATEPUZZLE_API UBaseUserWidget : public UUserWidget
 
 public:
     // Play the animation
+    UFUNCTION()
     void ShowAnim(UWidgetAnimation* Anim);
     // Play the animation with Timer
     void ShowAnimTimer(UWidgetAnimation* Anim, float RateTime);
@@ -29,6 +31,9 @@ public:
     UWidgetAnimation* GetStartAnim() const { return (this->StartAnim); }
     UWidgetAnimation* GetEndAnim() const { return (this->EndAnim); }
 
+    // Enable button active
+    void EnableButtonActive() const {}
+
 protected:
     // required animations for all child classes Start and End animation
     UPROPERTY(Transient, meta = (BindWidgetAnim))
@@ -36,10 +41,16 @@ protected:
     UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* EndAnim;
 
+    // Change Game state with timer
+    void ChangeGameStateTimer(EGameState NewState, float RateTime);
+
     // Init
     virtual void NativeOnInitialized() override;
     // Getting Current Game mode
     AGamePlayMode* GetGamePlayMode() const { return (this->GamePlayMode); }
+
+    // State Activided buttons
+    bool bIsButtonActive = true;
 
 private:
     // Timer to play the animation at a given time
