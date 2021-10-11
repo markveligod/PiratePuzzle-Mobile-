@@ -4,6 +4,7 @@
 #include "AIController.h"
 #include "Game/AI/Pirate/PirateAICharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Game/AI/Shark/SharkCharacter.h"
 #include "Game/AI/SkeletonRunner/SkeletonRunnerCharacter.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogSetNextLocation, All, All);
@@ -52,6 +53,14 @@ EBTNodeResult::Type USetNextLocationBTTaskNode::ExecuteTask(UBehaviorTreeCompone
         // UE_LOG(LogSetNextLocation, Error, TEXT("AI Skeleton runner current state: %s"),
         // *UEnum::GetValueAsString(TempAICharacter->GetStateAISkeletonRunner()));
     }
+    else if (this->SetCharacter == ASharkCharacter::StaticClass())
+    {
+        ASharkCharacter* TempAICharacter = Cast<ASharkCharacter>(Controller->GetCharacter());
+        BlackBoard->SetValueAsVector(this->NewLocation.SelectedKeyName, TempAICharacter->GetNextPosTag());
+        UE_LOG(LogSetNextLocation, Display, TEXT("AI Shark Status: %s"), *UEnum::GetValueAsString(EBTNodeResult::Succeeded));
+        return (EBTNodeResult::Succeeded);
+    }
+
     // UE_LOG(LogSetNextLocation, Error, TEXT("AI pointer on class character doesn't exist"));
     return EBTNodeResult::Failed;
 }
