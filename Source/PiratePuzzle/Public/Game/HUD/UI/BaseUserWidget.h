@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "BaseUserWidget.generated.h"
 
+class AGamePlayMode;
 /**
  *
  */
@@ -13,4 +14,45 @@ UCLASS()
 class PIRATEPUZZLE_API UBaseUserWidget : public UUserWidget
 {
     GENERATED_BODY()
+
+public:
+    // Play the animation
+    void ShowAnim(UWidgetAnimation* Anim);
+    // Play the animation with Timer
+    void ShowAnimTimer(UWidgetAnimation* Anim, float RateTime);
+
+    // Getting start and end animation rate time
+    float GetRateTimeStartAnim() const { return (this->RateTimeStartAnim); }
+    float GetRateTimeEndAnim() const { return (this->RateTimeEndAnim); }
+
+    // Getting start and end animation
+    UWidgetAnimation* GetStartAnim() const { return (this->StartAnim); }
+    UWidgetAnimation* GetEndAnim() const { return (this->EndAnim); }
+
+protected:
+    // required animations for all child classes Start and End animation
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* StartAnim;
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* EndAnim;
+
+    // Init
+    virtual void NativeOnInitialized() override;
+    // Getting Current Game mode
+    AGamePlayMode* GetGamePlayMode() const { return (this->GamePlayMode); }
+
+private:
+    // Timer to play the animation at a given time
+    FTimerHandle TimerDelayCallBack;
+
+    // Pointer on Current class AGamePlayMode
+    AGamePlayMode* GamePlayMode;
+
+    // Mandatory setting of the exact time animation playback Start and End
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Anim",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Specify the start animation time"))
+    float RateTimeStartAnim = 0.5f;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Anim",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Specify the end animation time"))
+    float RateTimeEndAnim = 0.5f;
 };
