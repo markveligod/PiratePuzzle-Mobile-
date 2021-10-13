@@ -2,6 +2,17 @@
 
 #include "AIDataTypes.generated.h"
 
+// A special state for a skeleton with a cannon
+UENUM(BlueprintType)
+enum class EStateSkeletonCannon : uint8
+{
+    None = 0,
+    Fire,
+    Reload,
+    Win,
+    Lose
+};
+
 // State player ai character
 UENUM(BlueprintType)
 enum class EStateAI : uint8
