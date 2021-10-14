@@ -16,19 +16,37 @@ void UGameUserWidget::NativeOnInitialized()
 
     this->CameraButton->OnClicked.AddDynamic(this, &UGameUserWidget::OnClickedSwapCamera);
     this->BackButton->OnClicked.AddDynamic(this, &UGameUserWidget::OnClickedBackPos);
+    this->PauseButton->OnClicked.AddDynamic(this, &UGameUserWidget::OnClickedPauseState);
 
     UE_LOG(LogGameUserWidget, Display, TEXT("Native On Initialized"));
 }
 
 void UGameUserWidget::OnClickedSwapCamera()
 {
+    if (!GetStateActiveButton()) return;
+    DisableButtonActive();
+    ButtonActiveTimer(true, DelayCloseButton);
+    PlayAnimation(this->CameraButtonAnim);
+
     GetGamePlayMode()->GetCameraPawn()->StartSwapCamera();
 }
 
 void UGameUserWidget::OnClickedBackPos()
 {
+    if (!GetStateActiveButton()) return;
     FIntPoint LastPoint = GetGamePlayMode()->GetCameraPawn()->GetAIPirate()->GetLastPositionPoint();
     if (LastPoint == FIntPoint(-1, -1)) return;
+    DisableButtonActive();
+    ButtonActiveTimer(true, DelayCloseButton);
+    PlayAnimation(this->BackButtonAnim);
 
     GetGamePlayMode()->GetCameraPawn()->StartMoveAICharacterOnPos(LastPoint);
+}
+
+void UGameUserWidget::OnClickedPauseState()
+{
+    if (!GetStateActiveButton()) return;
+    DisableButtonActive();
+    PlayAnimation(this->PauseButtonAnim);
+    ChangeGameStateTimer(EGameState::Pause, DelayCloseButton);
 }

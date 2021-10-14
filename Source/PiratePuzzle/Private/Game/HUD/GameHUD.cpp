@@ -45,10 +45,12 @@ void AGameHUD::BeginPlay()
 
     checkf(this->StartInfoWidgetClass, TEXT("Start Info widget class is nullptr"));
     checkf(this->GameWidgetClass, TEXT("Game widget class is nullptr"));
+    checkf(this->PauseWidgetClass, TEXT("Pause widget class is nullptr"));
 
     // Create and add widget
     this->GameWidgets.Add(EGameState::StartInfo, CreateWidget<UBaseUserWidget>(GetWorld(), this->StartInfoWidgetClass));
     this->GameWidgets.Add(EGameState::GameProgress, CreateWidget<UBaseUserWidget>(GetWorld(), this->GameWidgetClass));
+    this->GameWidgets.Add(EGameState::Pause, CreateWidget<UBaseUserWidget>(GetWorld(), this->PauseWidgetClass));
 
     // Set Hidden and add to viewport
     for (const auto Widget : this->GameWidgets)

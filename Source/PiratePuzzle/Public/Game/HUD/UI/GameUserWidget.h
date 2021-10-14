@@ -19,10 +19,21 @@ protected:
     virtual void NativeOnInitialized() override;
 
 private:
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(Transient, meta = (BindWidget))
     UButton* CameraButton;
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(Transient, meta = (BindWidget))
     UButton* BackButton;
+    UPROPERTY(Transient, meta = (BindWidget))
+    UButton* PauseButton;
+
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* HelpButtonAnim;
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* PauseButtonAnim;
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* CameraButtonAnim;
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* BackButtonAnim;
 
     // Function on Click swap camera
     UFUNCTION()
@@ -31,4 +42,8 @@ private:
     // Function on Click Back position pirate
     UFUNCTION()
     void OnClickedBackPos();
+
+    // Function on Click Pause state
+    UFUNCTION()
+    void OnClickedPauseState();
 };

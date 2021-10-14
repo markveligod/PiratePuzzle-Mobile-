@@ -32,8 +32,13 @@ public:
     UWidgetAnimation* GetEndAnim() const { return (this->EndAnim); }
 
     // Enable button active
+    UFUNCTION()
     void EnableButtonActive() { this->bIsButtonActive = true; }
+    // Disable button active
+    UFUNCTION()
     void DisableButtonActive() { this->bIsButtonActive = false; }
+    // Timer state Button Active change function
+    void ButtonActiveTimer(bool State, float RateTime);
     // State Active button
     bool GetStateActiveButton() const { return (this->bIsButtonActive); }
 
@@ -51,6 +56,11 @@ protected:
     virtual void NativeOnInitialized() override;
     // Getting Current Game mode
     AGamePlayMode* GetGamePlayMode() const { return (this->GamePlayMode); }
+
+    // Close button delay before change game state
+    UPROPERTY(
+        EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Anim", meta = (ToolTip = "Close button delay before change game state"))
+    float DelayCloseButton = 0.3f;
 
 private:
     // State Activided buttons

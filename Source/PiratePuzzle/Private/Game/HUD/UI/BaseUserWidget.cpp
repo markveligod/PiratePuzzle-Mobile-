@@ -34,6 +34,16 @@ void UBaseUserWidget::ShowAnimTimer(UWidgetAnimation* Anim, float RateTime)
     UE_LOG(LogBaseUserWidget, Display, TEXT("Name: %s | Play animation: %s | Time: %f"), *GetName(), *Anim->GetName(), RateTime);
 }
 
+void UBaseUserWidget::ButtonActiveTimer(bool State, float RateTime)
+{
+    FName NameFunc = (State == true) ? "EnableButtonActive" : "DisableButtonActive";
+
+    FTimerDelegate TempDelegate;
+    TempDelegate.BindUFunction(this, NameFunc);
+    FTimerHandle TempTimer;
+    GetWorld()->GetTimerManager().SetTimer(TempTimer, TempDelegate, RateTime, false);
+}
+
 void UBaseUserWidget::ChangeGameStateTimer(EGameState NewState, float RateTime)
 {
     FTimerDelegate TimerDelegate;

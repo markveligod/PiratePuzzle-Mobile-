@@ -4,30 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "Game/HUD/UI/BaseUserWidget.h"
-#include "StartInfoUserWidget.generated.h"
+#include "PauseUserWidget.generated.h"
 
 class UButton;
 /**
  *
  */
 UCLASS()
-class PIRATEPUZZLE_API UStartInfoUserWidget : public UBaseUserWidget
+class PIRATEPUZZLE_API UPauseUserWidget : public UBaseUserWidget
 {
     GENERATED_BODY()
 
 protected:
-    // Bind close button
-    UPROPERTY(Transient, meta = (BindWidget))
-    UButton* CloseButton;
-
-    // Animation for close button
-    UPROPERTY(Transient, meta = (BindWidgetAnim))
-    UWidgetAnimation* CloseButtonAnim;
-
     virtual void NativeOnInitialized() override;
 
 private:
-    // Close widget to state game progress
+    UPROPERTY(Transient, meta = (BindWidget))
+    UButton* CloseButton;
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* CloseButtonAnim;
+
+    // Function for switching to the game state
     UFUNCTION()
-    void CloseWidget();
+    void OnClickedCloseWidget();
 };
