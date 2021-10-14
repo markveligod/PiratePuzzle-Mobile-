@@ -114,7 +114,7 @@ private:
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
         meta = (AllowPrivateAccess = "true", ToolTip = "Pirate pointer ref"))
     TSubclassOf<APirateAICharacter> SpawnPirateRef;
-    // Treasure point position for Spawn on platform
+    // Pirate point position for Spawn on platform
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
         meta = (AllowPrivateAccess = "true", ToolTip = "Pirate point position for Spawn on platform"))
     FIntPoint PosPirate;

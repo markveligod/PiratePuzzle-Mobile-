@@ -188,7 +188,9 @@ void AGridGeneratorActor::SpawnPirate()
         this->AIPirate = Cast<APirateAICharacter>(
             UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), this->SpawnPirateRef, nullptr, SpawnPos, TempRot));
         if (!this->AIPirate) return;
-        UE_LOG(LogGridGeneratorActor, Display, TEXT("AI pirate: %s spawned"), *this->AIPirate->GetName());
+        this->AIPirate->SetNewPosPlayer(this->PosPirate);
+        UE_LOG(LogGridGeneratorActor, Display, TEXT("AI pirate: %s spawned on %s position platform"), *this->AIPirate->GetName(),
+            *this->PosPirate.ToString());
 
         auto CameraBase = Cast<ACameraPawn>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraPawn::StaticClass()));
         if (!CameraBase) return;

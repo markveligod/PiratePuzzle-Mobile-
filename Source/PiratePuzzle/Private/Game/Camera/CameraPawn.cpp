@@ -7,10 +7,13 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SphereComponent.h"
+#include "Game/GamePlayMode.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Game/AI/Pirate/PirateAICharacter.h"
+#include "Game/Grid/GridGeneratorActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Game/Grid/GridPlatformActor.h"
+#include "UtilsLib/BaseUtils.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCameraPawn, All, All);
 
@@ -52,6 +55,28 @@ void ACameraPawn::BeginPlay()
     checkf(this->SpringArmComponent, TEXT("Spring arm component is nullptr"));
     checkf(this->CameraComponent, TEXT("Camera component is nullptr"));
     checkf(this->SphereComponent, TEXT("Sphere component is nullptr"));
+
+    // Set Default Rotation Camera
+    this->RotDefaultCamera = this->SpringArmComponent->GetRelativeRotation();
+
+    this->GameMode = Cast<AGamePlayMode>(GetWorld()->GetAuthGameMode());
+    checkf(this->GameMode, TEXT("Game play mode is nullptr"));
+}
+
+void ACameraPawn::ChangeCameraPosition(float DeltaTime)
+{
+    if (this->TimeElyps < this->DefaultRateTime)
+    {
+        FRotator NewRot = FMath::Lerp(this->StartRot, this->EndRot, this->TimeElyps / this->DefaultRateTime);
+        this->SpringArmComponent->SetRelativeRotation(NewRot);
+        this->TimeElyps += DeltaTime;
+        if (this->TimeElyps >= this->DefaultRateTime)
+        {
+            this->EnableAnimCamera = false;
+            this->TimeElyps = 0.f;
+            UE_LOG(LogCameraPawn, Display, TEXT("The camera successfully changed the view: %s"), *NewRot.ToString())
+        }
+    }
 }
 
 void ACameraPawn::OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location)
@@ -69,8 +94,8 @@ void ACameraPawn::OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Locatio
     if (this->AIPlayer->GetStateAI() != EStateAI::Idle) return;
     if (!this->UpdateDirectionForPlayer()) return;
 
-    FVector NewPointLocation;
-    if ((NewPointLocation = this->TryFindNewPointLocation()).IsZero())
+    FIntPoint NewPointLocation;
+    if ((NewPointLocation = this->TryFindNewPointLocation()) == FIntPoint(-1, -1))
     {
         UE_LOG(LogCameraPawn, Error, TEXT("New point Location is zero: %s"), *NewPointLocation.ToString());
         return;
@@ -78,10 +103,27 @@ void ACameraPawn::OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Locatio
     this->StartMoveAICharacterOnPos(NewPointLocation);
 }
 
-void ACameraPawn::StartMoveAICharacterOnPos(FVector NewPos)
+void ACameraPawn::StartMoveAICharacterOnPos(FIntPoint NewPoint)
 {
+    if (this->AIPlayer->GetStateAI() == EStateAI::Walk) return;
+
+    auto TempMap = this->GameMode->GetGridGenerator()->GetMapPlatformOnGrid();
+    FVector NewPos = BaseUtils::GetVectorPositionPlatform(NewPoint, TempMap);
     this->AIPlayer->SetNextLocation(NewPos);
+    this->AIPlayer->SetNewPosPlayer(NewPoint);
     this->AIPlayer->SetStateAI(EStateAI::Walk);
+}
+
+void ACameraPawn::StartSwapCamera()
+{
+    if (this->EnableAnimCamera) return;
+
+    this->StartRot = (this->IsCameraUp == true) ? this->RotUpCamera : this->RotDefaultCamera;
+    this->EndRot = (this->IsCameraUp == true) ? this->RotDefaultCamera : this->RotUpCamera;
+    this->IsCameraUp = (this->IsCameraUp == true) ? false : true;
+
+    this->EnableAnimCamera = true;
+    UE_LOG(LogCameraPawn, Display, TEXT("Start animation camera from %s to %s"), *this->StartRot.ToString(), *this->EndRot.ToString());
 }
 
 bool ACameraPawn::UpdateDirectionForPlayer()
@@ -109,7 +151,7 @@ bool ACameraPawn::UpdateDirectionForPlayer()
     return (true);
 }
 
-FVector ACameraPawn::TryFindNewPointLocation()
+FIntPoint ACameraPawn::TryFindNewPointLocation()
 {
     FVector StartLine = this->AIPlayer->GetCapsuleComponent()->GetComponentLocation();
     FVector EndLine = StartLine + this->BaseRotationPlayer[this->DirectionPlayer].RotationPlayer.Vector() * this->DistanceTrace;
@@ -151,21 +193,20 @@ FVector ACameraPawn::TryFindNewPointLocation()
             }
 
             const auto TempPlatform = Cast<AGridPlatformActor>(TempSecondActor);
-            if (!TempPlatform) return (FVector::ZeroVector);
+            if (!TempPlatform) return (FIntPoint(-1, -1));
 
             const FIntPoint TempPosPlatform = TempPlatform->GetPositionPlatform();
             const FIntPoint TempPosAICharacter = this->AIPlayer->GetPosPlayer();
 
-            if (TempPosPlatform == TempPosAICharacter) return (FVector::ZeroVector);
+            if (TempPosPlatform == TempPosAICharacter) return (FIntPoint(-1, -1));
 
-            this->AIPlayer->SetNewPosPlayer(TempPosPlatform);
+            FIntPoint BeforePos = this->AIPlayer->GetPosPlayer();
+            if (BeforePos != FIntPoint(-1, -1)) this->AIPlayer->AddBeforePos(BeforePos);
             UE_LOG(LogCameraPawn, Display, TEXT("New Position AI player: %s"), *TempPosPlatform.ToString());
-            FVector ResVec = TempSecondActor->GetActorLocation();
-            ResVec.Z += 100.f;
-            return (ResVec);
+            return (TempPosPlatform);
         }
     }
-    return (FVector::ZeroVector);
+    return (FIntPoint(-1, -1));
 }
 
 FHitResult ACameraPawn::TryGetTrace(
@@ -181,6 +222,7 @@ FHitResult ACameraPawn::TryGetTrace(
 void ACameraPawn::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    if (this->EnableAnimCamera) this->ChangeCameraPosition(DeltaTime);
 }
 
 // Called to bind functionality to input

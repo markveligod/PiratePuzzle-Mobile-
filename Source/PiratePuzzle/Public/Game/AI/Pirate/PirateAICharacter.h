@@ -34,7 +34,14 @@ public:
     UFUNCTION(BlueprintCallable)
     const EStateAI& GetStateAI() const { return (this->StateAI); }
 
+    // Setting state AI pirate
     void SetStateAI(EStateAI NewState) { this->StateAI = NewState; }
+
+    // Get Last position from Array point's
+    FIntPoint GetLastPositionPoint();
+
+    // Adding before position in array
+    void AddBeforePos(FIntPoint NewPoint) { this->ArrayPointPos.Add(NewPoint); }
 
 protected:
     // Called when the game starts or when spawned
@@ -42,11 +49,14 @@ protected:
 
 private:
     // Position Player on grid
-    FIntPoint PosPlayer;
+    FIntPoint PosPlayer = FIntPoint(-1, -1);
 
     // enum State Ai character
     EStateAI StateAI = EStateAI::None;
 
     // Value new location for function move to
     FVector NextLocation;
+
+    // Array Position
+    TArray<FIntPoint> ArrayPointPos;
 };

@@ -30,6 +30,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void OnChangeGameState(EGameState NewState);
 
+    // Getting pointer on camera pawn
+    ACameraPawn* GetCameraPawn() const { return (this->CameraPawn); }
+
 protected:
     virtual void StartPlay() override;
 

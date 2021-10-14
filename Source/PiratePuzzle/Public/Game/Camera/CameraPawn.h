@@ -7,6 +7,7 @@
 #include "Game/Camera/CameraDataTypes.h"
 #include "CameraPawn.generated.h"
 
+class AGamePlayMode;
 class APirateAICharacter;
 class USpringArmComponent;
 class UCameraComponent;
@@ -30,13 +31,22 @@ public:
     void SetAIPirate(APirateAICharacter* Pirate) { this->AIPlayer = Pirate; }
 
     // Run move ai character
-    void StartMoveAICharacterOnPos(FVector NewPos);
+    void StartMoveAICharacterOnPos(FIntPoint NewPoint);
+
+    // Function for starting the camera change
+    UFUNCTION(BlueprintCallable)
+    void StartSwapCamera();
+
+    // Getting pointer on AI pirate
+    APirateAICharacter* GetAIPirate() const { return (this->AIPlayer); }
 
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
 private:
+    AGamePlayMode* GameMode;
+
     // root Scene component
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     USceneComponent* SceneRootComponent;
@@ -98,6 +108,33 @@ private:
         meta = (AllowPrivateAccess = "true", ToolTip = "Segments debug sphere.", EditCondition = "bEnableDebugTrace"))
     int32 SegmentsSphere = 5.f;
 
+    /*
+     * Settings animation camera swap
+     */
+    // Camera relative rotation from above
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Anim Camera",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Camera relative rotation from above."))
+    FRotator RotUpCamera = FRotator::ZeroRotator;
+    // Time to change the camera in seconds
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Anim Camera",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Time to change the camera in seconds."))
+    float DefaultRateTime = 1.f;
+    // Default camera relative rotation
+    FRotator RotDefaultCamera;
+    // State Camera is Upper
+    bool IsCameraUp = false;
+    // State Start Animation Camera
+    bool EnableAnimCamera = false;
+    // Start rotation value
+    FRotator StartRot;
+    // End rotation value
+    FRotator EndRot;
+    // Intermediate values for the alpha channel
+    float TimeElyps = 0.f;
+
+    // Camera change function
+    void ChangeCameraPosition(float DeltaTime);
+
     // Pack function for register touch of the finger
     void OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location);
     void OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Location);
@@ -105,7 +142,7 @@ private:
     // Calculation of values for determining the current direction of the player
     bool UpdateDirectionForPlayer();
     // Find new Location
-    FVector TryFindNewPointLocation();
+    FIntPoint TryFindNewPointLocation();
     // TryGetTrace
     FHitResult TryGetTrace(FVector StartPos, FVector EndPos, FCollisionQueryParams Params, FCollisionObjectQueryParams ObjectParams);
 
