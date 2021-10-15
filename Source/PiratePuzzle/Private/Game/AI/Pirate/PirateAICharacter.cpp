@@ -2,6 +2,8 @@
 
 #include "Game/AI/Pirate/PirateAICharacter.h"
 
+#include "Game/AI/SkeletonCannon/BulletActor.h"
+
 DEFINE_LOG_CATEGORY_STATIC(LogPirateAICharacter, All, All);
 
 // Sets default values

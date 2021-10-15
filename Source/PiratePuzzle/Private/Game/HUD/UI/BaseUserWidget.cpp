@@ -44,15 +44,6 @@ void UBaseUserWidget::ButtonActiveTimer(bool State, float RateTime)
     GetWorld()->GetTimerManager().SetTimer(TempTimer, TempDelegate, RateTime, false);
 }
 
-void UBaseUserWidget::ChangeGameStateTimer(EGameState NewState, float RateTime)
-{
-    FTimerDelegate TimerDelegate;
-    TimerDelegate.BindUFunction(this->GamePlayMode, FName("OnChangeGameState"), NewState);
-    GetWorld()->GetTimerManager().SetTimer(this->TimerDelayCallBack, TimerDelegate, RateTime, false);
-    UE_LOG(LogBaseUserWidget, Display, TEXT("Name: %s | Change on New State: %s | Time: %f"), *GetName(),
-        *UEnum::GetValueAsString(NewState), RateTime);
-}
-
 void UBaseUserWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();

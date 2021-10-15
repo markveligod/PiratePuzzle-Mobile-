@@ -49,9 +49,6 @@ protected:
     UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* EndAnim;
 
-    // Change Game state with timer
-    void ChangeGameStateTimer(EGameState NewState, float RateTime);
-
     // Init
     virtual void NativeOnInitialized() override;
     // Getting Current Game mode

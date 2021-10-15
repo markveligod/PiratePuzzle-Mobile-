@@ -30,6 +30,15 @@ void AGamePlayMode::OnChangeGameState(EGameState NewState)
     this->OnGameStateChanged.Broadcast(NewState);
 }
 
+void AGamePlayMode::OnChangeGameStateTimer(EGameState State, float Time)
+{
+    float TempTime = (Time == 0.f) ? this->RateTime : Time;
+    FTimerHandle TimerHandle;
+    FTimerDelegate TimerDelegate;
+    TimerDelegate.BindUFunction(this, "OnChangeGameState", State);
+    GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TempTime, false);
+}
+
 void AGamePlayMode::StartPlay()
 {
     Super::StartPlay();

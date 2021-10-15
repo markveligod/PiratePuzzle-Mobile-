@@ -48,5 +48,5 @@ void UGameUserWidget::OnClickedPauseState()
     if (!GetStateActiveButton()) return;
     DisableButtonActive();
     PlayAnimation(this->PauseButtonAnim);
-    ChangeGameStateTimer(EGameState::Pause, DelayCloseButton);
+    GetGamePlayMode()->OnChangeGameStateTimer(EGameState::Pause, DelayCloseButton);
 }

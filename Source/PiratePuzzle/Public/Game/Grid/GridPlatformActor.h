@@ -29,8 +29,8 @@ protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
-    // Change state with timer
-    void OnChangeStateTimer(EGameState State, float RateTime);
+    // Getting pointer on current game mode
+    AGamePlayMode* GetGamePlayMode() const { return (this->GameMode); }
 
 private:
     // Pointer on Game mode

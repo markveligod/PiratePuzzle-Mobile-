@@ -2,6 +2,7 @@
 
 #include "Game/HUD/UI/PauseUserWidget.h"
 #include "Components/Button.h"
+#include "Game/GamePlayMode.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogPauseUserWidget, All, All);
 
@@ -20,5 +21,5 @@ void UPauseUserWidget::OnClickedCloseWidget()
     this->DisableButtonActive();
 
     PlayAnimation(this->CloseButtonAnim);
-    ChangeGameStateTimer(EGameState::GameProgress, this->DelayCloseButton);
+    GetGamePlayMode()->OnChangeGameStateTimer(EGameState::GameProgress, this->DelayCloseButton);
 }

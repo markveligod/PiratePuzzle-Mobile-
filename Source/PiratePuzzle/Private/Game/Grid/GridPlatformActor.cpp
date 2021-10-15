@@ -30,14 +30,6 @@ void AGridPlatformActor::BeginPlay()
     this->GameMode = Cast<AGamePlayMode>(GetWorld()->GetAuthGameMode());
 }
 
-void AGridPlatformActor::OnChangeStateTimer(EGameState State, float RateTime)
-{
-    FTimerHandle TimerHandle;
-    FTimerDelegate TimerDelegate;
-    TimerDelegate.BindUFunction(this->GameMode, "OnChangeGameState", State);
-    GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, RateTime, false);
-}
-
 // Called every frame
 void AGridPlatformActor::Tick(float DeltaTime)
 {

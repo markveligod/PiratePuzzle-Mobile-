@@ -14,6 +14,6 @@ void UStartInfoUserWidget::CloseWidget()
 {
     if (!GetStateActiveButton()) return;
     ShowAnim(this->CloseButtonAnim);
-    ChangeGameStateTimer(EGameState::GameProgress, this->DelayCloseButton);
+    GetGamePlayMode()->OnChangeGameStateTimer(EGameState::GameProgress, this->DelayCloseButton);
     DisableButtonActive();
 }

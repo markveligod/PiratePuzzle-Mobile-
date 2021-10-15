@@ -6,6 +6,7 @@
 #include "Game/Grid/GridPlatformActor.h"
 #include "GridQuicksandPlatform.generated.h"
 
+class APirateAICharacter;
 class UBoxComponent;
 /**
  *
@@ -20,16 +21,30 @@ public:
 
 protected:
     virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override;
 
 private:
     // Box collision for register begin overlap with Pirate
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UBoxComponent* BoxCollision;
 
-    // Time after how long will the state change
+    // Time of immersion in sand
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Sand",
-        meta = (AllowPrivateAccess = "true", ToolTip = "Time after how long will the state change."))
-    float RateTime = 1.5f;
+        meta = (AllowPrivateAccess = "true", ToolTip = "Time of immersion in sand."))
+    float RateTimeSand = 1.f;
+    // To what depth to immerse on axis Z
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Sand",
+        meta = (AllowPrivateAccess = "true", ToolTip = "To what depth to immerse on axis Z."))
+    float Depth = 100.f;
+
+    AActor* SuicideBomber;
+    bool bEnableDepth = false;
+    float TimeElyps = 0.f;
+    float StartPos;
+    float EndPos;
+
+    // Pirate dive function
+    void DiveAIPirate(float DeltaTime);
 
     // Register begin overlap
     UFUNCTION()

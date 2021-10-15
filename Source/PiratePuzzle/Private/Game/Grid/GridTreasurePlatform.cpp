@@ -2,6 +2,7 @@
 
 #include "Game/Grid/GridTreasurePlatform.h"
 #include "Components/BoxComponent.h"
+#include "Game/GamePlayMode.h"
 #include "Game/AI/Pirate/PirateAICharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -37,6 +38,6 @@ void AGridTreasurePlatform::RegisterCollisionOverlap(UPrimitiveComponent* Overla
         AIPirate->SetStateAI(EStateAI::Win);
         AIPirate->GetCharacterMovement()->StopActiveMovement();
         AIPirate->SetActorLocation(this->BoxCollision->GetComponentLocation());
-        OnChangeStateTimer(EGameState::GameWin, this->RateTime);
+        GetGamePlayMode()->OnChangeGameStateTimer(EGameState::GameWin, this->RateTime);
     }
 }
