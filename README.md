@@ -1,9 +1,10 @@
-# :barbados: PiratePuzzle <a name="main"></a>
+# :passenger_ship: PiratePuzzle <a name="main"></a>
 ## :bookmark_tabs: Table of contents
 * [General description of the game](#Description)
 * [Devops](#Devops)
 * [Technical documentation](#Tech)
   * [Generator Grid](#GenGrid)
+  * [Types of platforms](#Types)
 * [Other](#Other)
 
 ## :page_with_curl: General description of the game <a name="Description"></a>
@@ -99,8 +100,66 @@ The `AGridWallActor` class uses the following parameters to appear on the grid:
     // Array pointer spawn wall on grid
     TArray<AGridWallActor*> WallsGrid;
 ```
+The `APirateAICharacter` class uses the following parameters to appear on the grid:  
+```
+    // Pirate pointer ref
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Pirate pointer ref"))
+    TSubclassOf<APirateAICharacter> SpawnPirateRef;
+    // Pirate point position for Spawn on platform
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Pirate point position for Spawn on platform"))
+    FIntPoint PosPirate;
+    // Adds along the Z axis when a pirate spawns
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Adds along the Z axis when a pirate spawns"))
+    float AddPiratePosZ = 50.f;
+    // The angle of rotation when spawning a pirate
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
+        meta = (AllowPrivateAccess = "true", ToolTip = "The angle of rotation when spawning a pirate"))
+    float PirateRotZ = 0.f;
+    // Pointer on pirate
+    APirateAICharacter* AIPirate;
+```
+The `ASkeletonRunnerCharacter` class uses the following parameters to appear on the grid:  
+```
+    // Pirate pointer ref
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Skeleton Runner",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Skeleton Runner pointer ref"))
+    TSubclassOf<ASkeletonRunnerCharacter> SpawnSkeletonRunnerRef;
+    // Array information for spawn Skeleton Runner
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Skeleton Runner",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Array information for spawn Skeleton Runner"))
+    TArray<FInfoSpawnSkeletonRunner> ArrayInfoSpawnSkeletonRunners;
+    // Adds along the Z axis when a pirate spawns
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Skeleton Runner",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Adds along the Z axis when a Skeleton Runner spawns"))
+    float AddSkeletonRunnerPosZ = 50.f;
+    // Pointers on skeleton runners
+    TArray<ASkeletonRunnerCharacter*> ArraySkeletonRunners;
+```
+The `AGridGeneratorActor` class has an override `virtual void OnConstruction(const FTransform& Transform) override;` function that allows you to adjust the necessary grid settings in the editor before the spawn itself in the gameplay.  
 
+### :butter: Types of platforms <a name="Types"></a>
+:open_file_folder: Path:  \<Project\>/Source/PiratePuzzle/Public(Private)/Game/Grid/\*.  
+The base class for all types of platforms is `AGridPlatformActor`. It defines the basic parameters for all child classes of classes.  
+The basic parameters are:  
+```
+    // Main scene root components
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    USceneComponent* SceneRoot;
+    // Static mesh item
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    UStaticMeshComponent* StaticMeshComponent;
+    // Debug position item on grid
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    UTextRenderComponent* TextDebugPosition;
 
+    // Current Position on grid generator
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    FIntPoint PlatformPos = FIntPoint(-1, -1);
+```
+**TODO: Описать дочерние классы**
 
 
 ## 📫 Other <a name="Other"></a>
