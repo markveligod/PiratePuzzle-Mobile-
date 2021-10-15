@@ -116,6 +116,7 @@ void ACameraPawn::StartMoveAICharacterOnPos(FIntPoint NewPoint)
 
 void ACameraPawn::StartSwapCamera()
 {
+    if (this->AIPlayer->GetStateAI() != EStateAI::Idle && this->AIPlayer->GetStateAI() != EStateAI::Walk) return;
     if (this->EnableAnimCamera) return;
 
     this->StartRot = (this->IsCameraUp == true) ? this->RotUpCamera : this->RotDefaultCamera;

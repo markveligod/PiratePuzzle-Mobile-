@@ -33,6 +33,9 @@ public:
     // Getting pointer on camera pawn
     ACameraPawn* GetCameraPawn() const { return (this->CameraPawn); }
 
+    // Getting current game play state
+    EGameState GetGameState() const { return (this->GameState); }
+
 protected:
     virtual void StartPlay() override;
 

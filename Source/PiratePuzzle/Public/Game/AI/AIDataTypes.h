@@ -21,6 +21,7 @@ enum class EStateAI : uint8
     Idle,
     Walk,
     Death,
+    DeathSand,
     Win,
     Attack
 };

@@ -41,6 +41,12 @@ private:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI",
         meta = (AllowPrivateAccess = "true", ToolTip = "Game widget UI from UBaseUserWidget"))
     TSubclassOf<UBaseUserWidget> PauseWidgetClass;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Game widget UI from UBaseUserWidget"))
+    TSubclassOf<UBaseUserWidget> GameWinWidgetClass;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Game widget UI from UBaseUserWidget"))
+    TSubclassOf<UBaseUserWidget> GameOverWidgetClass;
 
     // Callback function for changing widgets depending on the game state
     void OnChangeGameState(EGameState NewState);
