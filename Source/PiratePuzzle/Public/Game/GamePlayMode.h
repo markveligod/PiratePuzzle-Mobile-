@@ -36,6 +36,7 @@ public:
     ACameraPawn* GetCameraPawn() const { return (this->CameraPawn); }
 
     // Getting current game play state
+    UFUNCTION(BlueprintCallable)
     EGameState GetGameState() const { return (this->GameState); }
 
 protected:
