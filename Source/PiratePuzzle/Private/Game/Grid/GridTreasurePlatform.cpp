@@ -38,6 +38,6 @@ void AGridTreasurePlatform::RegisterCollisionOverlap(UPrimitiveComponent* Overla
         AIPirate->SetStateAI(EStateAI::Win);
         AIPirate->GetCharacterMovement()->StopActiveMovement();
         AIPirate->SetActorLocation(this->BoxCollision->GetComponentLocation());
-        GetGamePlayMode()->OnChangeGameStateTimer(EGameState::GameWin, this->RateTime);
+        GetGamePlayMode()->OnChangeGameStateTimer(EGameState::GameWin);
     }
 }

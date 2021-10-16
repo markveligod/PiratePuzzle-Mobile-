@@ -25,10 +25,7 @@ private:
     // Box collision for register begin overlap with Pirate
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UBoxComponent* BoxCollision;
-    // Time after how long will the state change
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Treasure",
-        meta = (AllowPrivateAccess = "true", ToolTip = "Time after how long will the state change."))
-    float RateTime = 1.5f;
+
     // Register begin overlap
     UFUNCTION()
     void RegisterCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
