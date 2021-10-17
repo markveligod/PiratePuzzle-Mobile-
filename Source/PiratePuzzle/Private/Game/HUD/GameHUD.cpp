@@ -30,7 +30,7 @@ void AGameHUD::DrawHUD()
 
     if (this->GameMode && EnableDebugHUD)
     {
-        auto ArrayPointerSkeletons = this->GameMode->GetGridGenerator()->GetArraySkeletonPointers();
+        auto ArrayPointerSkeletons = this->GameMode->GetGridGenerator()->GetArraySkeletonRunners();
         for (int32 i = 0; i < ArrayPointerSkeletons.Num(); i++)
         {
             AddText(TEXT("----------Skeleton Runner----------"), FText::FromString("#" + FString::FromInt(i)));

@@ -28,7 +28,7 @@ public:
     const TMap<FIntPoint, AGridPlatformActor*>& GetMapPlatformOnGrid() const { return (this->MapPlatformsOnGrid); }
 
     // Getting array pointer skeleton runners
-    const TArray<ASkeletonRunnerCharacter*>& GetArraySkeletonPointers() const { return (this->ArraySkeletonRunners); }
+    const TArray<ASkeletonRunnerCharacter*>& GetArraySkeletonRunners() const { return (this->ArraySkeletonRunners); }
 
 protected:
     // Called when the game starts or when spawned

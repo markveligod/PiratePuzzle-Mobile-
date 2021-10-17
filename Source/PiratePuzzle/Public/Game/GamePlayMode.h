@@ -53,4 +53,7 @@ private:
 
     // Current Game State
     EGameState GameState = EGameState::WaitToStart;
+
+    // Function to stop all running skeletons on the grid
+    void StopAllSkeletonRunner();
 };
