@@ -5,6 +5,8 @@
 #include "DrawDebugHelpers.h"
 #include "Game/AI/SkeletonCannon/BulletActor.h"
 #include "Game/AI/SkeletonCannon/Notifys/SpawnBulletAnimNotify.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogSkeletonCannonPawn, All, All);
 
@@ -80,6 +82,7 @@ void ASkeletonCannonPawn::SpawnBulletFromNotify()
     {
         TempBullet->SetShotDirection(Direction);
         TempBullet->FinishSpawning(SpawnTransform);
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->EffectShot, this->SceneSpawnBullet->GetComponentLocation());
         UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Skeleton Cannon: %s | Bullet: %s | Location: %s | is spawning"), *GetName(), *TempBullet->GetName(), *SpawnTransform.GetLocation().ToString());
     }
 }

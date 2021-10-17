@@ -1,6 +1,8 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
 #include "Game/Grid/GridQuicksandPlatform.h"
+
+#include "NiagaraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/GamePlayMode.h"
@@ -15,6 +17,10 @@ AGridQuicksandPlatform::AGridQuicksandPlatform()
     // Create Box Collision
     this->BoxCollision = CreateDefaultSubobject<UBoxComponent>("Box Collision component");
     this->BoxCollision->SetupAttachment(GetRootComponent());
+
+    // Create effect quicksand
+    this->EffectQuickSand = CreateDefaultSubobject<UNiagaraComponent>("Effect quicksand");
+    this->EffectQuickSand->SetupAttachment(GetRootComponent());
 }
 
 void AGridQuicksandPlatform::BeginPlay()

@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "SkeletonCannonPawn.generated.h"
 
+class UNiagaraSystem;
 class ABulletActor;
 UCLASS()
 class PIRATEPUZZLE_API ASkeletonCannonPawn : public APawn
@@ -50,7 +51,10 @@ private:
     // Reference sub class bullet
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Pawn", meta = (AllowPrivateAccess = true, ToolTip = "Reference sub class bullet."))
     TSubclassOf<ABulletActor> RefBulletClass;
-
+    // Effect to simulate a cannon shot
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Pawn", meta = (AllowPrivateAccess = true, ToolTip = "Effect to simulate a cannon shot."))
+    UNiagaraSystem* EffectShot;
+    
     // Enable Debug trace bullet
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Debug Bullet", meta = (AllowPrivateAccess = true, ToolTip = "Enable Debug trace bullet."))
     bool bEnableDebugTrace = true;
