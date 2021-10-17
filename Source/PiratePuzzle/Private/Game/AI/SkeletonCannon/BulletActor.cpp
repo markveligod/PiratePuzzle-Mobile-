@@ -5,6 +5,9 @@
 #include "Game/AI/Pirate/PirateAICharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBulletActor, All, All);
 
@@ -24,6 +27,10 @@ ABulletActor::ABulletActor()
 
     // Create projectile movement component
     this->ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("Projectile movement component");
+
+    // Create effect projectile
+    this->EffectProjectile = CreateDefaultSubobject<UNiagaraComponent>("Effect projectile");
+    this->EffectProjectile->SetupAttachment(this->SceneRoot);
 }
 
 // Called when the game starts or when spawned
@@ -58,6 +65,8 @@ void ABulletActor::OnRegisterCollisionBeginOverlap(UPrimitiveComponent* Overlapp
         AIPirate->GetCharacterMovement()->StopActiveMovement();
         this->GameMode->OnChangeGameStateTimer(EGameState::GameOver);
     }
-
-    Destroy();
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->EffectDestroy, GetActorLocation());
+    this->StaticMeshBullet->SetVisibility(false);
+    this->ProjectileMovement->Velocity = FVector::ZeroVector;
+    SetLifeSpan(0.5f);
 }
