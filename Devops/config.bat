@@ -17,7 +17,7 @@ set ProjectPath=%ProjectRoot%\%ProjectName%
 
 rem Build params
 set Platform=Android
-set Configuration=Development
+set Configuration=Shipping
 set ArchivePath=%ProjectRoot%\Build
 
 rem Other params
