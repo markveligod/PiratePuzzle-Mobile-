@@ -21,7 +21,9 @@
 * ProjectRoot  
 * ProjectPureName  
   
-**P.s. The rest are optional and necessary...**
+**P.s. The rest are optional and necessary...**  
+
+:bangbang: For clang-format to work correctly, you need to set the full path to the environment variables.  
 ### misc
 * `clean_intermediate_files.bat` - Clears temporary folders that UE4 creates.  
 * `format_all_files.bat` - Manual formatting under .clang-format files (.h .cpp .cs).  

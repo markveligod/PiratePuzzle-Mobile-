@@ -16,7 +16,7 @@ set ProjectName=%ProjectPureName%.uproject
 set ProjectPath=%ProjectRoot%\%ProjectName%
 
 rem Build params
-set Platform=Win64
+set Platform=Android
 set Configuration=Development
 set ArchivePath=%ProjectRoot%\Build
 

@@ -8,3 +8,5 @@ call "%~dp0\..\config.bat"
 -clientconfig="%Configuration%" ^
 -archivedirectory="%ArchivePath%" ^
 -build -cook -package -stage -archive -pak -allmaps
+
+PAUSE
