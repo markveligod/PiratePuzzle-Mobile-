@@ -14,10 +14,27 @@
 
 ## :card_index: Devops <a name="Devops"></a>
 :open_file_folder: Path: \<Project\>/Devops/\*  
-* `clear-project-files.bat` - Clears temporary folders that UE4 creates.
-* `format-allfiles.bat` - Manual formatting under .clang-format files (.h .cpp .cs). :bangbang:To work correctly, you need to set the path to clang-format in the environment variable.
-* `generate-project-files.bat` - Generates files for the UE4 engine. :bangbang:To work correctly in the script, you need to specify the correct path to the variables: VersionSelector, ProjectName, EnginePath, UBTRelativePath.  
-* `install-pre-commit.bat` - Installs bash script in the root of the Hook folder for automatic formatting of clang-format files (.h .cpp .cs)  
+:bangbang: Before using scripts, it is important to edit `config.bat`:
+* EnginePath  
+* UBTRelativePath  
+* VersionSelector  
+* ProjectRoot  
+* ProjectPureName  
+  
+**P.s. The rest are optional and necessary...**
+### misc
+* `clean_intermediate_files.bat` - Clears temporary folders that UE4 creates.  
+* `format_all_files.bat` - Manual formatting under .clang-format files (.h .cpp .cs).  
+* `generate_project_files.bat` - Generates files for the UE4 engine.  
+### githooks
+* `install_git_hooks.bat` - Installs bash script in the root of the Hook folder for automatic formatting of clang-format files (.h .cpp .cs)  
+### cook
+* `cook_game.bat` - Builds cookies for the current project.  
+### package
+* `package_game.bat` - Packs the project for Android.  
+### tests
+* `create_test_file.bat` - Creates a class template for tests.  
+
 
 ## :memo: Technical documentation <a name="Tech"></a>
 ### :1234: Generator Grid <a name="GenGrid"></a>
