@@ -28,10 +28,10 @@ private:
     // Box collision for register begin overlap with Pirate
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UBoxComponent* BoxCollision;
-    // Effect for emulating quicksand 
+    // Effect for emulating quicksand
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UNiagaraComponent* EffectQuickSand;
-    
+
     // Time of immersion in sand
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Sand",
         meta = (AllowPrivateAccess = "true", ToolTip = "Time of immersion in sand."))

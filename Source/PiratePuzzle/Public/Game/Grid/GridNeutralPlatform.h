@@ -7,11 +7,10 @@
 #include "GridNeutralPlatform.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class PIRATEPUZZLE_API AGridNeutralPlatform : public AGridPlatformActor
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
 };

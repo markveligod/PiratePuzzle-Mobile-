@@ -10,7 +10,7 @@ void UGameOverUserWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
     this->RestartButton->OnClicked.AddDynamic(this, &UGameOverUserWidget::OnClickedRestart);
-    
+
     UE_LOG(LogGameOverUserWidget, Display, TEXT("Native On Initialized"));
 }
 

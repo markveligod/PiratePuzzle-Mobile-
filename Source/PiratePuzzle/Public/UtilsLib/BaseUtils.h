@@ -29,7 +29,7 @@ public:
             }
         }
     }
-    
+
     // Find the zero position in the map on Grid
     static FVector GetZeroPositionOnGrid(int32 IndexHeight, TMap<FIntPoint, AGridPlatformActor*>& MapPlatformsOnGrid)
     {

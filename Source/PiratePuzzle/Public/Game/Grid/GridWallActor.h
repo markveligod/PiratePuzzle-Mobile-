@@ -10,15 +10,15 @@ class UBoxComponent;
 UCLASS()
 class PIRATEPUZZLE_API AGridWallActor : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AGridWallActor();
-    
+    GENERATED_BODY()
+
+public:
+    // Sets default values for this actor's properties
+    AGridWallActor();
+
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
 private:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))

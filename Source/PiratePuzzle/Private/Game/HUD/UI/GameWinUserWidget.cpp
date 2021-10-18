@@ -12,9 +12,8 @@ void UGameWinUserWidget::NativeOnInitialized()
     Super::NativeOnInitialized();
 
     this->RestartButton->OnClicked.AddDynamic(this, &UGameWinUserWidget::OnClickedRestart);
-    
+
     UE_LOG(LogGameWinUserWidget, Display, TEXT("Native On Initialized"));
-    
 }
 
 void UGameWinUserWidget::OnClickedRestart()

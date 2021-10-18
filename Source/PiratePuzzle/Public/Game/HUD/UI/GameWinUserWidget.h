@@ -27,6 +27,4 @@ private:
     // Restart game
     UFUNCTION()
     void OnClickedRestart();
-    
-    
 };
