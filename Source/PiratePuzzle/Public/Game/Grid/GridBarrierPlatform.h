@@ -9,19 +9,20 @@
 class UBoxComponent;
 
 /**
- * 
+ *
  */
 UCLASS()
 class PIRATEPUZZLE_API AGridBarrierPlatform : public AGridPlatformActor
 {
     GENERATED_BODY()
-    
+
 public:
     AGridBarrierPlatform();
 
 protected:
     virtual void BeginPlay() override;
     virtual void OnConstruction(const FTransform& Transform) override;
+
 private:
     // Box collision barrier
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))

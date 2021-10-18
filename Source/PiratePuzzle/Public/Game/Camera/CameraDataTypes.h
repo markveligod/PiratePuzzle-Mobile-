@@ -39,4 +39,3 @@ struct FInfoTrace
         this->TraceLocation = Other.TraceLocation;
     }
 };
-

@@ -1,6 +1,5 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
-
 #include "Game/AI/SkeletonCannon/SkeletonCannonPawn.h"
 #include "DrawDebugHelpers.h"
 #include "Game/AI/SkeletonCannon/BulletActor.h"
@@ -13,9 +12,9 @@ DEFINE_LOG_CATEGORY_STATIC(LogSkeletonCannonPawn, All, All);
 // Sets default values
 ASkeletonCannonPawn::ASkeletonCannonPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
-    
+    // Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = false;
+
     // Create root scene component
     this->RootScene = CreateDefaultSubobject<USceneComponent>("Root Scene");
     SetRootComponent(this->RootScene);
@@ -32,7 +31,7 @@ ASkeletonCannonPawn::ASkeletonCannonPawn()
 // Called when the game starts or when spawned
 void ASkeletonCannonPawn::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
     checkf(this->RootScene, TEXT("Root scene is nullptr"));
     checkf(this->SkeletalCannon, TEXT("Skeletal Cannon is nullptr"));
 
@@ -41,7 +40,7 @@ void ASkeletonCannonPawn::BeginPlay()
     this->StateSkeletonCannon = EStateSkeletonCannon::Reload;
 
     GetWorld()->GetTimerManager().SetTimer(this->TimerAnimFR, this, &ASkeletonCannonPawn::SwapAnimState, this->TimeRateReload, false);
-    
+
     const auto ListNotifyes = this->AnimShoot->Notifies;
     for (auto TempClassNotify : ListNotifyes)
     {
@@ -70,7 +69,7 @@ void ASkeletonCannonPawn::SpawnBulletFromNotify()
 
     if (this->bEnableDebugTrace)
         DrawDebugLine(GetWorld(), StartPos, EndPos, this->ColorTrace, false, this->LifeTimeTrace, 0, this->RateThickness);
-    
+
     const FVector Direction = (EndPos - StartPos).GetSafeNormal();
 
     FTransform SpawnTransform;
@@ -83,7 +82,7 @@ void ASkeletonCannonPawn::SpawnBulletFromNotify()
         TempBullet->SetShotDirection(Direction);
         TempBullet->FinishSpawning(SpawnTransform);
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->EffectShot, this->SceneSpawnBullet->GetComponentLocation());
-        UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Skeleton Cannon: %s | Bullet: %s | Location: %s | is spawning"), *GetName(), *TempBullet->GetName(), *SpawnTransform.GetLocation().ToString());
+        UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Skeleton Cannon: %s | Bullet: %s | Location: %s | is spawning"), *GetName(),
+            *TempBullet->GetName(), *SpawnTransform.GetLocation().ToString());
     }
 }
-

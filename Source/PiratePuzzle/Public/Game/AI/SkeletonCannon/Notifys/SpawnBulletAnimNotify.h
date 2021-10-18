@@ -9,12 +9,12 @@
 DECLARE_MULTICAST_DELEGATE(FOnSpawnBulletAnimNotifySignature);
 
 /**
- * 
+ *
  */
 UCLASS()
 class PIRATEPUZZLE_API USpawnBulletAnimNotify : public UAnimNotify
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 public:
     FOnSpawnBulletAnimNotifySignature OnSpawnBulletAnimNotify;
 
