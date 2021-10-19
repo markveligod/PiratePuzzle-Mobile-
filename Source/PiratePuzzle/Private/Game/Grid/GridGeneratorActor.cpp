@@ -1,7 +1,6 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
 #include "Game/Grid/GridGeneratorActor.h"
-
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Components/TextRenderComponent.h"
@@ -17,6 +16,7 @@
 #include "Game/Camera/CameraPawn.h"
 #include "Game/AI/SkeletonRunner/SkeletonRunnerCharacter.h"
 #include "Game/AI/SkeletonRunner/SkeletonRunnerAIController.h"
+#include "Game/Gold/GoldActor.h"
 
 // Declaring a static variable for logging
 DEFINE_LOG_CATEGORY_STATIC(LogGridGeneratorActor, All, All);
@@ -48,6 +48,7 @@ void AGridGeneratorActor::BeginPlay()
     if (this->SpawnWallRef) this->SpawnWall();
     if (this->SpawnPirateRef) this->SpawnPirate();
     if (this->SpawnSkeletonRunnerRef) this->SpawnSkeletonRunners();
+    if (this->SpawnGoldRef) this->SpawnGold();
     this->StaticMeshHandleComponent->DestroyComponent();
 }
 
@@ -60,6 +61,7 @@ void AGridGeneratorActor::OnConstruction(const FTransform& Transform)
     if (this->SpawnWallRef) this->SpawnWall();
     if (this->SpawnPirateRef) this->SpawnPirate();
     if (this->SpawnSkeletonRunnerRef) this->SpawnSkeletonRunners();
+    if (this->SpawnGoldRef) this->SpawnGold();
 }
 
 void AGridGeneratorActor::SpawnPlatform()
@@ -218,6 +220,30 @@ void AGridGeneratorActor::SpawnSkeletonRunners()
     }
 }
 
+void AGridGeneratorActor::SpawnGold()
+{
+    for (FIntPoint PosPoint : this->ArrayPosGold)
+    {
+        FVector SpawnLocation = BaseUtils::GetVectorPositionPlatform(PosPoint, this->MapPlatformsOnGrid);
+        if (SpawnLocation == FVector::ZeroVector)
+        {
+            UE_LOG(LogGridGeneratorActor, Error, TEXT("Spawn location is zero vector on point: %s"), *PosPoint.ToString());
+            continue;
+        }
+
+        SpawnLocation.Z += this->AddGoldPosAxisZ;
+        AGoldActor* TempGold = GetWorld()->SpawnActor<AGoldActor>(this->SpawnGoldRef, FTransform(SpawnLocation));
+        if (!TempGold)
+        {
+            UE_LOG(LogGridGeneratorActor, Error, TEXT("Spawn AGoldActor doesn't exist on point: %s"), *PosPoint.ToString());
+            continue;
+        }
+
+        UE_LOG(LogGridGeneratorActor, Display, TEXT("Spawn %s on point %s is successed"), *TempGold->GetName(), *PosPoint.ToString());
+        this->ArrayGolds.Add(TempGold);
+    }
+}
+
 void AGridGeneratorActor::ClearGrid()
 {
     // Platform
@@ -258,4 +284,11 @@ void AGridGeneratorActor::ClearGrid()
     for (auto TempController : ArraySkeletonController)
         TempController->Destroy();
     this->ArraySkeletonRunners.Empty();
+
+    // Gold
+    TArray<AGoldActor*> ArrayGold;
+    BaseUtils::FillArrayActorOfClass<AGoldActor>(GetWorld(), this->SpawnGoldRef, ArrayGold);
+    for (auto TempGold : ArrayGold)
+        TempGold->Destroy();
+    this->ArrayGolds.Empty();
 }

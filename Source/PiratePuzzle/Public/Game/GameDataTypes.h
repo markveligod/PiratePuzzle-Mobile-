@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Math/Interval.h"
 #include "GameDataTypes.generated.h"
 
 // game state structure for easy switching between widgets
@@ -16,3 +17,13 @@ enum class EGameState : uint8
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedSignature, EGameState);
+
+// Own interval
+USTRUCT(BlueprintType)
+struct FIntervalFloat : public FFloatInterval
+{
+    GENERATED_BODY();
+
+    FIntervalFloat() {}
+    FIntervalFloat(float Max, float Min) : FFloatInterval(Max, Min) {}
+};

@@ -15,6 +15,7 @@ class AGridWallActor;
 class AGridPlatformActor;
 class APirateAICharacter;
 class ASkeletonRunnerCharacter;
+class AGoldActor;
 UCLASS()
 class PIRATEPUZZLE_API AGridGeneratorActor : public AActor
 {
@@ -143,12 +144,31 @@ private:
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Skeleton Runner",
         meta = (AllowPrivateAccess = "true", ToolTip = "Array information for spawn Skeleton Runner"))
     TArray<FInfoSpawnSkeletonRunner> ArrayInfoSpawnSkeletonRunners;
-    // Adds along the Z axis when a pirate spawns
+    // Adds along the Z axis when a pirate spawn
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Skeleton Runner",
-        meta = (AllowPrivateAccess = "true", ToolTip = "Adds along the Z axis when a Skeleton Runner spawns"))
+        meta = (AllowPrivateAccess = "true", ToolTip = "Adds along the Z axis when a Skeleton Runner spawn"))
     float AddSkeletonRunnerPosZ = 50.f;
     // Pointers on skeleton runners
     TArray<ASkeletonRunnerCharacter*> ArraySkeletonRunners;
+
+    /*
+     * Part Settings for spawn Gold
+     */
+    // GoldActor pointer ref
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Gold",
+        meta = (AllowPrivateAccess = "true", ToolTip = "GoldActor pointer ref"))
+    TSubclassOf<AGoldActor> SpawnGoldRef;
+    // GoldActor point position for Spawn on platform
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Gold",
+        meta = (AllowPrivateAccess = "true", ToolTip = "GoldActor point position for Spawn on platform"))
+    TArray<FIntPoint> ArrayPosGold;
+    // Adds along the Z axis when a GoldActor spawn
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Gold",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Adds along the Z axis when a GoldActor spawn"))
+    float AddGoldPosAxisZ = 50.f;
+
+    // Array pointers Gold Actor
+    TArray<AGoldActor*> ArrayGolds;
 
     // Spawn platform on Grid
     void SpawnPlatform();
@@ -164,6 +184,9 @@ private:
 
     // Spawn Skeleton Runners
     void SpawnSkeletonRunners();
+
+    // Spawn Gold on platform
+    void SpawnGold();
 
     // Clear grid
     void ClearGrid();

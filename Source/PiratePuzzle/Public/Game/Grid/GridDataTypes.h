@@ -10,3 +10,14 @@ enum class EStatePlatform : uint8
     Quicksand,
     Treasure
 };
+
+UENUM(BlueprintType)
+enum class EStateLoading : uint8
+{
+    None = 0,
+    SpawnPlatform,
+    SpawnWall,
+    SpawnPirate,
+    SpawnSkeletonRunner,
+    SpawnGold
+};

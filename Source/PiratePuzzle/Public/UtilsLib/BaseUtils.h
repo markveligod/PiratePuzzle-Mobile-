@@ -43,4 +43,13 @@ public:
         if (MapPlatformsOnGrid.Contains(Pos)) return (MapPlatformsOnGrid[Pos]->GetActorLocation());
         return (FVector::ZeroVector);
     }
+
+    // template for changing values for a specific data type
+    template <typename Data>
+    static void SwapData(Data& Data1, Data& Data2)
+    {
+        Data TempData = Data1;
+        Data1 = Data2;
+        Data2 = TempData;
+    }
 };
