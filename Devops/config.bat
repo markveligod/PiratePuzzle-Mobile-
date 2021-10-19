@@ -1,16 +1,16 @@
 @echo off
 
 rem Engine params
-set EnginePath=D:\UE_4.26
+set EnginePath=C:\Program Files\Epic Games\UE_4.26
 
 set UBTRelativePath=Engine\Binaries\DotNET\UnrealBuildTool.exe
-set VersionSelector=d:\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe
+set VersionSelector=C:\Program Files (x86)\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe
 
 rem !! Engine version for packaging !!
 set RunUATPath=%EnginePath%\Engine\Build\BatchFiles\RunUAT.bat
 
 rem Project params
-set ProjectRoot=C:\Users\mark\Desktop\NewPiratePuzzle
+set ProjectRoot=C:\Users\Mark\Desktop\NewPiratePuzzle
 set ProjectPureName=PiratePuzzle
 set ProjectName=%ProjectPureName%.uproject
 set ProjectPath=%ProjectRoot%\%ProjectName%
