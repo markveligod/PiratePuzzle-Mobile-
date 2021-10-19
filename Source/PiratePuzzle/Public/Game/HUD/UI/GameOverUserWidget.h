@@ -23,8 +23,16 @@ private:
     UButton* RestartButton;
     UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* RestartButtonAnim;
+    UPROPERTY(Transient, meta = (BindWidget))
+    UButton* AdsButton;
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* AdsButtonAnim;
 
     // Restart game
     UFUNCTION()
     void OnClickedRestart();
+
+    // Ads game
+    UFUNCTION()
+    void OnClickedAds();
 };

@@ -9,4 +9,3 @@ call "%~dp0\..\config.bat"
 -archivedirectory="%ArchivePath%" ^
 -build -cook -package -stage -archive -pak -allmaps -nocompileeditor
 
-PAUSE

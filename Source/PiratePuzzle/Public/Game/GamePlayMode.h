@@ -39,6 +39,10 @@ public:
     UFUNCTION(BlueprintCallable)
     EGameState GetGameState() const { return (this->GameState); }
 
+    // Reset from quicksand dead
+    UFUNCTION(BlueprintCallable)
+    void ResetDead();
+
 protected:
     virtual void StartPlay() override;
 

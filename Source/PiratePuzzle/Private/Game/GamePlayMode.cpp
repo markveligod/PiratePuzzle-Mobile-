@@ -2,6 +2,8 @@
 
 #include "Game/GamePlayMode.h"
 
+#include "Components/CapsuleComponent.h"
+#include "Game/AI/Pirate/PirateAICharacter.h"
 #include "Game/AI/SkeletonRunner/SkeletonRunnerCharacter.h"
 #include "Game/Camera/CameraPawn.h"
 #include "Game/Camera/CameraPlayerController.h"
@@ -9,6 +11,7 @@
 #include "Game/HUD/GameHUD.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "UtilsLib/BaseUtils.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGamePlayMode, All, All);
 
@@ -68,4 +71,33 @@ void AGamePlayMode::StopAllSkeletonRunner()
         TempRunner->GetCharacterMovement()->StopActiveMovement();
     }
     UE_LOG(LogGamePlayMode, Display, TEXT("All skeleton runners is stop movement"));
+}
+
+void AGamePlayMode::ResetDead()
+{
+    APirateAICharacter* TempPirate = this->CameraPawn->GetAIPirate();
+    FIntPoint LastPoint = TempPirate->GetLastPositionPoint();
+    auto MapPlatform = this->GridGeneratorPlatform->GetMapPlatformOnGrid();
+    FVector ResetToLocation = BaseUtils::GetVectorPositionPlatform(LastPoint, MapPlatform);
+    ResetToLocation.Z += this->GridGeneratorPlatform->GetPosPirateAxisZ();
+    if (ResetToLocation == FVector::ZeroVector)
+    {
+        UE_LOG(LogGamePlayMode, Error, TEXT("Platform doesn't exist in map %s"), *LastPoint.ToString());
+        return;
+    }
+    // Reset Pirate
+    TempPirate->SetActorLocation(ResetToLocation);
+    TempPirate->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    TempPirate->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+    TempPirate->SetStateAI(EStateAI::Idle);
+    TempPirate->SetNewPosPlayer(LastPoint);
+
+    // Reset Skeleton runner
+    auto ArraySkeletonRun = this->GridGeneratorPlatform->GetArraySkeletonRunners();
+    for (const auto TempRunner : ArraySkeletonRun)
+    {
+        TempRunner->SetNewStateAISkeletonRunner(EStateAI::Walk);
+    }
+
+    this->OnChangeGameState(EGameState::GameProgress);
 }

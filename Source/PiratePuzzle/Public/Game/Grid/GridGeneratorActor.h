@@ -30,6 +30,9 @@ public:
     // Getting array pointer skeleton runners
     const TArray<ASkeletonRunnerCharacter*>& GetArraySkeletonRunners() const { return (this->ArraySkeletonRunners); }
 
+    // Getting add Position on pirate in grid
+    float GetPosPirateAxisZ() const { return (this->AddPiratePosZ); }
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;

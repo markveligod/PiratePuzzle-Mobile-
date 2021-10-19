@@ -34,9 +34,14 @@ void UGameUserWidget::OnClickedSwapCamera()
 void UGameUserWidget::OnClickedBackPos()
 {
     if (!GetStateActiveButton()) return;
+    DisableButtonActive();
+
+    APirateAICharacter* TempPirate = GetGamePlayMode()->GetCameraPawn()->GetAIPirate();
+    if (TempPirate->GetStateAI() != EStateAI::Idle) return;
+
     FIntPoint LastPoint = GetGamePlayMode()->GetCameraPawn()->GetAIPirate()->GetLastPositionPoint();
     if (LastPoint == FIntPoint(-1, -1)) return;
-    DisableButtonActive();
+
     ButtonActiveTimer(true, DelayCloseButton);
     PlayAnimation(this->BackButtonAnim);
 

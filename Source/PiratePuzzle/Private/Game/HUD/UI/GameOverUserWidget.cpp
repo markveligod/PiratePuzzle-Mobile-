@@ -2,6 +2,7 @@
 
 #include "Game/HUD/UI/GameOverUserWidget.h"
 #include "Components/Button.h"
+#include "Game/GamePlayMode.h"
 #include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGameOverUserWidget, All, All);
@@ -10,6 +11,7 @@ void UGameOverUserWidget::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
     this->RestartButton->OnClicked.AddDynamic(this, &UGameOverUserWidget::OnClickedRestart);
+    this->AdsButton->OnClicked.AddDynamic(this, &UGameOverUserWidget::OnClickedAds);
 
     UE_LOG(LogGameOverUserWidget, Display, TEXT("Native On Initialized"));
 }
@@ -24,4 +26,9 @@ void UGameOverUserWidget::OnClickedRestart()
     TimerDelegate.BindStatic(&UGameplayStatics::OpenLevel, TempObj, NameLevel, true, FString(TEXT("")));
     FTimerHandle TimerHandle;
     GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, DelayCloseButton, false);
+}
+
+void UGameOverUserWidget::OnClickedAds()
+{
+    GetGamePlayMode()->ResetDead();
 }

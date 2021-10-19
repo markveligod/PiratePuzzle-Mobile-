@@ -15,7 +15,7 @@ APirateAICharacter::APirateAICharacter()
 
 FIntPoint APirateAICharacter::GetLastPositionPoint()
 {
-    if (this->ArrayPointPos.Num() > 0 && this->StateAI == EStateAI::Idle)
+    if (this->ArrayPointPos.Num() > 0)
     {
         FIntPoint TempPoint(this->ArrayPointPos.Last());
         this->ArrayPointPos.RemoveAt(this->ArrayPointPos.Num() - 1);
