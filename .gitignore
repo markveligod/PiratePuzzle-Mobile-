@@ -23,5 +23,5 @@ Plugins/*/Intermediate/*
 
 # Raw content
 /RawContent/**/* 
-Devops/config.bat
-PiratePuzzle.sln.DotSettings.user
+/Devops/config.bat
+/PiratePuzzle.sln.DotSettings.user
