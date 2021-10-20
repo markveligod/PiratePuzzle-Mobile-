@@ -52,6 +52,7 @@ protected:
     // Init
     virtual void NativeOnInitialized() override;
     // Getting Current Game mode
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "BaseUserWidget")
     AGamePlayMode* GetGamePlayMode() const { return (this->GamePlayMode); }
 
     // Close button delay before change game state

@@ -6,6 +6,9 @@
 #include "Components/SphereComponent.h"
 #include "Game/AI/Pirate/PirateAICharacter.h"
 #include "UtilsLib/BaseUtils.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGoldActor, All, All);
 
@@ -19,13 +22,13 @@ AGoldActor::AGoldActor()
     this->RootScene = CreateDefaultSubobject<USceneComponent>("Root Scene");
     SetRootComponent(this->RootScene);
 
-    // Create base static mesh component
-    this->GoldMesh = CreateDefaultSubobject<UStaticMeshComponent>("Gold Static mesh");
-    this->GoldMesh->SetupAttachment(this->RootScene);
-
     // Create collision component
     this->SphereCollision = CreateDefaultSubobject<USphereComponent>("Sphere component");
     this->SphereCollision->SetupAttachment(this->RootScene);
+
+    // Create Visual effect coin
+    this->EffectCoin = CreateDefaultSubobject<UNiagaraComponent>("Effect coin");
+    this->EffectCoin->SetupAttachment(this->RootScene);
 }
 
 // Called when the game starts or when spawned
@@ -33,7 +36,7 @@ void AGoldActor::BeginPlay()
 {
     Super::BeginPlay();
     checkf(this->RootScene, TEXT("Root scene is nullptr"));
-    checkf(this->GoldMesh, TEXT("Gold mesh is nullptr"));
+    checkf(this->EffectCoin, TEXT("Visual effect coin is nullptr"));
     checkf(this->SphereCollision, TEXT("Sphere collision is nullptr"));
     this->GameMode = Cast<AGamePlayMode>(GetWorld()->GetAuthGameMode());
     checkf(this->GameMode, TEXT("Game mode is nullptr"));
@@ -42,11 +45,6 @@ void AGoldActor::BeginPlay()
     this->GlobalEndLocation.Z += this->AddMovementAxisZ;
 
     this->SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AGoldActor::OnRegisterBeginOverlap);
-}
-
-void AGoldActor::RunRotationCoin(float DeltaTime)
-{
-    this->GoldMesh->AddRelativeRotation(FRotator(0.f, this->PowerRotYawCoin * DeltaTime, 0.f));
 }
 
 void AGoldActor::MoveLocationCoin(float DeltaTime)
@@ -75,7 +73,6 @@ void AGoldActor::MoveLocationCoin(float DeltaTime)
 void AGoldActor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    this->RunRotationCoin(DeltaTime);
     this->MoveLocationCoin(DeltaTime);
     if (this->EnableDebugInfo)
     {
@@ -99,6 +96,7 @@ void AGoldActor::OnRegisterBeginOverlap(UPrimitiveComponent* OverlappedComponent
     if (OtherActor->IsA(APirateAICharacter::StaticClass()))
     {
         this->GameMode->IncreaseCountCoin();
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->DestructionEffect, GetActorLocation());
         Destroy();
     }
 }

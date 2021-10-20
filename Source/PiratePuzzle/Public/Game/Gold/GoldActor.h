@@ -7,8 +7,10 @@
 #include "Game/GameDataTypes.h"
 #include "GoldActor.generated.h"
 
+class UNiagaraSystem;
 class AGamePlayMode;
 class USphereComponent;
+class UNiagaraComponent;
 UCLASS()
 class PIRATEPUZZLE_API AGoldActor : public AActor
 {
@@ -32,20 +34,20 @@ private:
     // Root Scene component
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
     USceneComponent* RootScene;
-    // Base static mesh component for Gold
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
-    UStaticMeshComponent* GoldMesh;
     // Sphere Collision for register begin overlap
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
     USphereComponent* SphereCollision;
-
+    // The visual effect of the coin
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+    UNiagaraComponent* EffectCoin;
+    
     /*
      * A set of parameters for determining the internal animation of a coin
      */
-    // The speed of rotation GoldMesh around the axis Yaw
+    // Destruction Effect
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold",
-        meta = (AllowPrivateAccess = true, ToolTip = "The speed of rotation GoldMesh around the axis."))
-    float PowerRotYawCoin = 2.f;
+        meta = (AllowPrivateAccess = true, ToolTip = "Destruction Effect."))
+    UNiagaraSystem* DestructionEffect;
     // How high will the path be on the Z axis
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold",
         meta = (AllowPrivateAccess = true, ToolTip = "How high will the path be on the Z axis."))
@@ -78,9 +80,6 @@ private:
 
     FVector GlobalStartLocation;
     FVector GlobalEndLocation;
-
-    // Coin rotation function around the axis Yaw for each frame
-    void RunRotationCoin(float DeltaTime);
 
     // The function of moving the class along the Z axis
     void MoveLocationCoin(float DeltaTime);

@@ -101,3 +101,9 @@ void AGamePlayMode::ResetDead()
 
     this->OnChangeGameState(EGameState::GameProgress);
 }
+
+void AGamePlayMode::IncreaseCountCoin()
+{
+    this->CountCoin++;
+    this->OnCoinIncrease.Execute(this->CountCoin);
+}

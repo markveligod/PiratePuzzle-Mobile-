@@ -26,6 +26,9 @@ public:
     // Delegate change current game state
     FOnGameStateChangedSignature OnGameStateChanged;
 
+    // A single delegate for sending information about
+    FCoinIncreaseSignature OnCoinIncrease;
+    
     // Change state function
     UFUNCTION(BlueprintCallable, Category = "GamePlayMode")
     void OnChangeGameState(EGameState NewState);
@@ -44,7 +47,7 @@ public:
     void ResetDead();
 
     // The function of increasing the number of coins
-    void IncreaseCountCoin() {this->CountCoin++;}
+    void IncreaseCountCoin();
 
     // Getting current number of coins
     UFUNCTION(BlueprintCallable, Category = "GamePlayMode")

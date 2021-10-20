@@ -36,7 +36,7 @@ EBTNodeResult::Type USetNextLocationBTTaskNode::ExecuteTask(UBehaviorTreeCompone
         if (TempAICharacter->GetStateAI() == EStateAI::Walk)
         {
             BlackBoard->SetValueAsVector(this->NewLocation.SelectedKeyName, TempAICharacter->GetNextLocation());
-            // UE_LOG(LogSetNextLocation, Display, TEXT("AI pirate Status: %s"), *UEnum::GetValueAsString(EBTNodeResult::Succeeded));
+            UE_LOG(LogSetNextLocation, Display, TEXT("AI pirate Status: %s"), *UEnum::GetValueAsString(EBTNodeResult::Succeeded));
             return (EBTNodeResult::Succeeded);
         }
         // UE_LOG(LogSetNextLocation, Error, TEXT("AI pirate current state: %s"), *UEnum::GetValueAsString(TempAICharacter->GetStateAI()));

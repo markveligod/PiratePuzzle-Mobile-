@@ -81,7 +81,7 @@ void ASkeletonCannonPawn::SpawnBulletFromNotify()
     {
         TempBullet->SetShotDirection(Direction);
         TempBullet->FinishSpawning(SpawnTransform);
-        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->EffectShot, this->SceneSpawnBullet->GetComponentLocation());
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->EffectShot, this->SceneSpawnBullet->GetComponentLocation(), FRotator(0.f, 0.f,-90.f));
         UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Skeleton Cannon: %s | Bullet: %s | Location: %s | is spawning"), *GetName(),
             *TempBullet->GetName(), *SpawnTransform.GetLocation().ToString());
     }

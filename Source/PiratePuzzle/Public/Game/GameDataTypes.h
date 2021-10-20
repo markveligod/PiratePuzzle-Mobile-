@@ -27,3 +27,6 @@ struct FIntervalFloat : public FFloatInterval
     FIntervalFloat() {}
     FIntervalFloat(float Max, float Min) : FFloatInterval(Max, Min) {}
 };
+
+// A single delegate for sending information about
+DECLARE_DELEGATE_OneParam(FCoinIncreaseSignature, int32);
