@@ -27,7 +27,7 @@ public:
     FOnGameStateChangedSignature OnGameStateChanged;
 
     // Change state function
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "GamePlayMode")
     void OnChangeGameState(EGameState NewState);
     // Change state with timer
     void OnChangeGameStateTimer(EGameState State, float Time = 0.f);
@@ -36,12 +36,19 @@ public:
     ACameraPawn* GetCameraPawn() const { return (this->CameraPawn); }
 
     // Getting current game play state
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "GamePlayMode")
     EGameState GetGameState() const { return (this->GameState); }
 
     // Reset from quicksand dead
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "GamePlayMode")
     void ResetDead();
+
+    // The function of increasing the number of coins
+    void IncreaseCountCoin() {this->CountCoin++;}
+
+    // Getting current number of coins
+    UFUNCTION(BlueprintCallable, Category = "GamePlayMode")
+    int32 GetCountCoin() const {return (this->CountCoin);}
 
 protected:
     virtual void StartPlay() override;
@@ -57,6 +64,9 @@ private:
 
     // Current Game State
     EGameState GameState = EGameState::WaitToStart;
+
+    // The number of coins collected at the current level
+    int32 CountCoin = 0;
 
     // Function to stop all running skeletons on the grid
     void StopAllSkeletonRunner();

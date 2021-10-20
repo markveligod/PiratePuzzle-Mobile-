@@ -1,9 +1,10 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
 #include "Game/Gold/GoldActor.h"
-
+#include "Game/GamePlayMode.h"
 #include "DrawDebugHelpers.h"
 #include "Components/SphereComponent.h"
+#include "Game/AI/Pirate/PirateAICharacter.h"
 #include "UtilsLib/BaseUtils.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGoldActor, All, All);
@@ -34,9 +35,13 @@ void AGoldActor::BeginPlay()
     checkf(this->RootScene, TEXT("Root scene is nullptr"));
     checkf(this->GoldMesh, TEXT("Gold mesh is nullptr"));
     checkf(this->SphereCollision, TEXT("Sphere collision is nullptr"));
+    this->GameMode = Cast<AGamePlayMode>(GetWorld()->GetAuthGameMode());
+    checkf(this->GameMode, TEXT("Game mode is nullptr"));
 
     this->GlobalStartLocation = this->GlobalEndLocation = GetActorLocation();
     this->GlobalEndLocation.Z += this->AddMovementAxisZ;
+
+    this->SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AGoldActor::OnRegisterBeginOverlap);
 }
 
 void AGoldActor::RunRotationCoin(float DeltaTime)
@@ -78,5 +83,22 @@ void AGoldActor::Tick(float DeltaTime)
         DrawDebugLine(
             GetWorld(), this->GlobalStartLocation, this->GlobalEndLocation, this->ColorTrace, false, -1.f, 0, this->ThicknessTrace);
         DrawDebugSphere(GetWorld(), this->GlobalEndLocation, this->RadiusSphere, this->SegmentsSphere, this->ColorTrace);
+    }
+}
+
+void AGoldActor::OnRegisterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (!OtherActor)
+    {
+        UE_LOG(LogGoldActor, Warning, TEXT("Name Gold: %s | Call register overlap with OtherActor == nullptr"), *GetName());
+        return;
+    }
+
+    // Pirate overlap
+    if (OtherActor->IsA(APirateAICharacter::StaticClass()))
+    {
+        this->GameMode->IncreaseCountCoin();
+        Destroy();
     }
 }

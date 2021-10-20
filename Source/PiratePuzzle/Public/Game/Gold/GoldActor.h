@@ -7,6 +7,7 @@
 #include "Game/GameDataTypes.h"
 #include "GoldActor.generated.h"
 
+class AGamePlayMode;
 class USphereComponent;
 UCLASS()
 class PIRATEPUZZLE_API AGoldActor : public AActor
@@ -25,6 +26,9 @@ protected:
     virtual void BeginPlay() override;
 
 private:
+    // Current Game mode
+    AGamePlayMode* GameMode;
+    
     // Root Scene component
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
     USceneComponent* RootScene;
@@ -80,4 +84,10 @@ private:
 
     // The function of moving the class along the Z axis
     void MoveLocationCoin(float DeltaTime);
+
+    // Function for registering a collision intersection
+    UFUNCTION()
+    void OnRegisterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 };
+
+
