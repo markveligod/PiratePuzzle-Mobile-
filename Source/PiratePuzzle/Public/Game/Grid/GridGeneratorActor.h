@@ -190,4 +190,7 @@ private:
 
     // Clear grid
     void ClearGrid();
+
+    // Friend class game mode
+    friend class AGamePlayMode;
 };

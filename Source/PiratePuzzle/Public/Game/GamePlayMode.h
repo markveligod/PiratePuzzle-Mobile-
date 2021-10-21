@@ -20,6 +20,10 @@ class PIRATEPUZZLE_API AGamePlayMode : public AGameModeBase
 public:
     AGamePlayMode();
 
+    // Getting status loading
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "GamePlayMode")
+    FString GetStatusLoading() const;
+
     // Getting pointer on grid generator
     AGridGeneratorActor* GetGridGenerator() { return (this->GridGeneratorPlatform); }
 
@@ -28,7 +32,7 @@ public:
 
     // A single delegate for sending information about
     FCoinIncreaseSignature OnCoinIncrease;
-    
+
     // Change state function
     UFUNCTION(BlueprintCallable, Category = "GamePlayMode")
     void OnChangeGameState(EGameState NewState);
@@ -51,7 +55,7 @@ public:
 
     // Getting current number of coins
     UFUNCTION(BlueprintCallable, Category = "GamePlayMode")
-    int32 GetCountCoin() const {return (this->CountCoin);}
+    int32 GetCountCoin() const { return (this->CountCoin); }
 
 protected:
     virtual void StartPlay() override;
@@ -59,6 +63,13 @@ protected:
 private:
     AGridGeneratorActor* GridGeneratorPlatform;
     ACameraPawn* CameraPawn;
+
+    // Status Loading
+    bool bSpawnPlatform = false;
+    bool bSpawnWall = false;
+    bool bSpawnPirate = false;
+    bool bSpawnSkeletonRunner = false;
+    bool bSpawnGold = false;
 
     // Time after how long will the state change
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Sand",
@@ -73,4 +84,15 @@ private:
 
     // Function to stop all running skeletons on the grid
     void StopAllSkeletonRunner();
+
+    // Spawn platform
+    void SpawnPlatform();
+    // Spawn Wall
+    void SpawnWall();
+    // Spawn Pirate
+    void SpawnPirate();
+    // Spawn Skeleton Runner
+    void SpawnSkeletonRunner();
+    // Spawn Gold
+    void SpawnGold();
 };

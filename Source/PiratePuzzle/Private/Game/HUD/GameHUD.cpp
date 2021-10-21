@@ -21,7 +21,7 @@ void AGameHUD::DrawHUD()
         AddText(TEXT("Game play state:"), FText::FromString(UEnum::GetValueAsString(this->GameMode->GetGameState())));
     }
 
-    if (CameraPawn && EnableDebugHUD)
+    if (CameraPawn && CameraPawn->AIPlayer && EnableDebugHUD)
     {
         AddText(TEXT("----------Pirate Data----------"), FText::FromString(""));
         AddText(TEXT("Current pirate state:"), FText::FromString(UEnum::GetValueAsString(CameraPawn->AIPlayer->GetStateAI())));
@@ -54,6 +54,7 @@ void AGameHUD::BeginPlay()
     checkf(this->PauseWidgetClass, TEXT("Pause widget class is nullptr"));
     checkf(this->GameWinWidgetClass, TEXT("Game Win widget class is nullptr"));
     checkf(this->GameOverWidgetClass, TEXT("Game Over widget class is nullptr"));
+    checkf(this->LoadingWidgetClass, TEXT("Loading widget class is nullptr"));
 
     // Create and add widget
     this->GameWidgets.Add(EGameState::StartInfo, CreateWidget<UBaseUserWidget>(GetWorld(), this->StartInfoWidgetClass));
@@ -61,6 +62,7 @@ void AGameHUD::BeginPlay()
     this->GameWidgets.Add(EGameState::Pause, CreateWidget<UBaseUserWidget>(GetWorld(), this->PauseWidgetClass));
     this->GameWidgets.Add(EGameState::GameWin, CreateWidget<UBaseUserWidget>(GetWorld(), this->GameWinWidgetClass));
     this->GameWidgets.Add(EGameState::GameOver, CreateWidget<UBaseUserWidget>(GetWorld(), this->GameOverWidgetClass));
+    this->GameWidgets.Add(EGameState::Loading, CreateWidget<UBaseUserWidget>(GetWorld(), this->LoadingWidgetClass));
 
     // Set Hidden and add to viewport
     for (const auto Widget : this->GameWidgets)

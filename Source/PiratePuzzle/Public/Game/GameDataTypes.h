@@ -8,6 +8,7 @@ UENUM(BlueprintType)
 enum class EGameState : uint8
 {
     WaitToStart = 0,
+    Loading,
     StartInfo,
     GameProgress,
     Pause,

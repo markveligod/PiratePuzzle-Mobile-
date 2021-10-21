@@ -43,13 +43,6 @@ void AGridGeneratorActor::BeginPlay()
     checkf(this->RootScene, TEXT("Root Scene component is nullptr"));
     checkf(this->StaticMeshHandleComponent, TEXT("Static Mesh Handle component is nullptr"));
     this->ClearGrid();
-    if (this->SpawnNeutralPlatformRef && this->SpawnBarrierPlatformRef && this->SpawnQuicksandPlatformRef && this->SpawnTreasurePlatformRef)
-        this->SpawnPlatform();
-    if (this->SpawnWallRef) this->SpawnWall();
-    if (this->SpawnPirateRef) this->SpawnPirate();
-    if (this->SpawnSkeletonRunnerRef) this->SpawnSkeletonRunners();
-    if (this->SpawnGoldRef) this->SpawnGold();
-    this->StaticMeshHandleComponent->DestroyComponent();
 }
 
 void AGridGeneratorActor::OnConstruction(const FTransform& Transform)

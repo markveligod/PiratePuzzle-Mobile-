@@ -22,6 +22,32 @@ AGamePlayMode::AGamePlayMode()
     HUDClass = AGameHUD::StaticClass();
 }
 
+FString AGamePlayMode::GetStatusLoading() const
+{
+    if (this->bSpawnPlatform && !this->bSpawnWall && !this->bSpawnPirate && !this->bSpawnSkeletonRunner && !this->bSpawnGold)
+    {
+        return ("Spawn platform");
+    }
+    else if (this->bSpawnPlatform && this->bSpawnWall && !this->bSpawnPirate && !this->bSpawnSkeletonRunner && !this->bSpawnGold)
+    {
+        return ("Spawn Wall");
+    }
+    else if (this->bSpawnPlatform && this->bSpawnWall && this->bSpawnPirate && !this->bSpawnSkeletonRunner && !this->bSpawnGold)
+    {
+        return ("Spawn Pirate");
+    }
+    else if (this->bSpawnPlatform && this->bSpawnWall && this->bSpawnPirate && this->bSpawnSkeletonRunner && !this->bSpawnGold)
+    {
+        return ("Spawn Skeleton Runner");
+    }
+    else if (this->bSpawnPlatform && this->bSpawnWall && this->bSpawnPirate && this->bSpawnSkeletonRunner && this->bSpawnGold)
+    {
+        return ("Spawn Gold");
+    }
+
+    return ("Preparing for spawn");
+}
+
 void AGamePlayMode::OnChangeGameState(EGameState NewState)
 {
     UE_LOG(LogGamePlayMode, Display, TEXT("Change new state on %s"), *UEnum::GetValueAsString(NewState));
@@ -59,7 +85,20 @@ void AGamePlayMode::StartPlay()
     this->CameraPawn = Cast<ACameraPawn>(UGameplayStatics::GetActorOfClass(GetWorld(), ACameraPawn::StaticClass()));
     checkf(this->CameraPawn, TEXT("Camera pawn is nullptr"));
 
-    this->OnChangeGameState(EGameState::StartInfo);
+    FTimerHandle TimerSpawnPlatform;
+    FTimerHandle TimerSpawnWall;
+    FTimerHandle TimerSpawnPirate;
+    FTimerHandle TimerSpawnSkeletonRunner;
+    FTimerHandle TimerSpawnGold;
+
+    GetWorldTimerManager().SetTimer(TimerSpawnPlatform, this, &AGamePlayMode::SpawnPlatform, 1.f, false);
+    GetWorldTimerManager().SetTimer(TimerSpawnWall, this, &AGamePlayMode::SpawnWall, 2.f, false);
+    GetWorldTimerManager().SetTimer(TimerSpawnPirate, this, &AGamePlayMode::SpawnPirate, 3.f, false);
+    GetWorldTimerManager().SetTimer(TimerSpawnSkeletonRunner, this, &AGamePlayMode::SpawnSkeletonRunner, 4.f, false);
+    GetWorldTimerManager().SetTimer(TimerSpawnGold, this, &AGamePlayMode::SpawnGold, 5.f, false);
+
+    this->OnChangeGameState(EGameState::Loading);
+    this->OnChangeGameStateTimer(EGameState::StartInfo, 6.f);
 }
 
 void AGamePlayMode::StopAllSkeletonRunner()
@@ -71,6 +110,36 @@ void AGamePlayMode::StopAllSkeletonRunner()
         TempRunner->GetCharacterMovement()->StopActiveMovement();
     }
     UE_LOG(LogGamePlayMode, Display, TEXT("All skeleton runners is stop movement"));
+}
+
+void AGamePlayMode::SpawnPlatform()
+{
+    this->GridGeneratorPlatform->SpawnPlatform();
+    this->bSpawnPlatform = true;
+}
+
+void AGamePlayMode::SpawnWall()
+{
+    this->GridGeneratorPlatform->SpawnWall();
+    this->bSpawnWall = true;
+}
+
+void AGamePlayMode::SpawnPirate()
+{
+    this->GridGeneratorPlatform->SpawnPirate();
+    this->bSpawnPirate = true;
+}
+
+void AGamePlayMode::SpawnSkeletonRunner()
+{
+    this->GridGeneratorPlatform->SpawnSkeletonRunners();
+    this->bSpawnSkeletonRunner = true;
+}
+
+void AGamePlayMode::SpawnGold()
+{
+    this->GridGeneratorPlatform->SpawnGold();
+    this->bSpawnGold = true;
 }
 
 void AGamePlayMode::ResetDead()
