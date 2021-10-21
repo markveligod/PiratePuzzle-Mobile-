@@ -10,7 +10,7 @@ rem !! Engine version for packaging !!
 set RunUATPath=%EnginePath%\Engine\Build\BatchFiles\RunUAT.bat
 
 rem Project params
-set ProjectRoot=C:\Users\Mark\Desktop\NewPiratePuzzle
+set ProjectRoot=C:\Users\007\Desktop\NewPiratePuzzle
 set ProjectPureName=PiratePuzzle
 set ProjectName=%ProjectPureName%.uproject
 set ProjectPath=%ProjectRoot%\%ProjectName%
