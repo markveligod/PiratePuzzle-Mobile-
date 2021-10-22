@@ -10,7 +10,8 @@ enum class EStateSkeletonCannon : uint8
     Fire,
     Reload,
     Win,
-    Lose
+    Lose,
+    Idle
 };
 
 // State player ai character

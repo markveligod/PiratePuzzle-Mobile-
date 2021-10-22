@@ -19,8 +19,8 @@ void UGameUserWidget::NativeOnInitialized()
     this->BackButton->OnClicked.AddDynamic(this, &UGameUserWidget::OnClickedBackPos);
     this->PauseButton->OnClicked.AddDynamic(this, &UGameUserWidget::OnClickedPauseState);
 
-    GetGamePlayMode()->OnCoinIncrease.BindUObject(this, &UGameUserWidget::ChangeCountCoin);
-    
+    GetGamePlayMode()->OnCoinIncrease.AddUObject(this, &UGameUserWidget::ChangeCountCoin);
+
     UE_LOG(LogGameUserWidget, Display, TEXT("Native On Initialized"));
 }
 
@@ -29,7 +29,7 @@ void UGameUserWidget::OnClickedSwapCamera()
     if (!GetStateActiveButton()) return;
     DisableButtonActive();
     ButtonActiveTimer(true, DelayCloseButton);
-    
+
     PlayAnimation(this->CameraButtonAnim);
     GetGamePlayMode()->GetCameraPawn()->StartSwapCamera();
 }
@@ -45,7 +45,7 @@ void UGameUserWidget::OnClickedBackPos()
 
     FIntPoint LastPoint = GetGamePlayMode()->GetCameraPawn()->GetAIPirate()->GetLastPositionPoint();
     if (LastPoint == FIntPoint(-1, -1)) return;
-    
+
     PlayAnimation(this->BackButtonAnim);
     GetGamePlayMode()->GetCameraPawn()->StartMoveAICharacterOnPos(LastPoint);
 }

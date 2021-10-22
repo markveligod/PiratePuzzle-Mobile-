@@ -30,4 +30,4 @@ struct FIntervalFloat : public FFloatInterval
 };
 
 // A single delegate for sending information about
-DECLARE_DELEGATE_OneParam(FCoinIncreaseSignature, int32);
+DECLARE_MULTICAST_DELEGATE_OneParam(FCoinIncreaseSignature, int32);

@@ -33,10 +33,10 @@ public:
 
     // Enable button active
     UFUNCTION()
-    void EnableButtonActive() { this->bIsButtonActive = true; }
+    virtual void EnableButtonActive() { this->bIsButtonActive = true; }
     // Disable button active
     UFUNCTION()
-    void DisableButtonActive() { this->bIsButtonActive = false; }
+    virtual void DisableButtonActive() { this->bIsButtonActive = false; }
     // Timer state Button Active change function
     void ButtonActiveTimer(bool State, float RateTime);
     // State Active button

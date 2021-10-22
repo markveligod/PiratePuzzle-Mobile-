@@ -7,6 +7,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "GamePlayMode.generated.h"
 
+class ASkeletonCannonPawn;
 class ACameraPawn;
 class AGridGeneratorActor;
 /**
@@ -61,8 +62,12 @@ protected:
     virtual void StartPlay() override;
 
 private:
+    // Pointer on AGridGeneratorActor class
     AGridGeneratorActor* GridGeneratorPlatform;
+    // Pointer on ACameraPawn class
     ACameraPawn* CameraPawn;
+    // Array pointers ASkeletonCannonPawn class
+    TArray<ASkeletonCannonPawn*> ArraySkeletonCannon;
 
     // Status Loading
     bool bSpawnPlatform = false;
@@ -84,6 +89,15 @@ private:
 
     // Function to stop all running skeletons on the grid
     void StopAllSkeletonRunner();
+
+    // Function to stop all Skeleton cannon on the level
+    void StopAllSkeletonCannon();
+
+    // Function to start all running skeletons on the grid
+    void StartAllSkeletonRunner();
+
+    // Function to start all Skeleton cannon on the level
+    void StartAllSkeletonCannon();
 
     // Spawn platform
     void SpawnPlatform();

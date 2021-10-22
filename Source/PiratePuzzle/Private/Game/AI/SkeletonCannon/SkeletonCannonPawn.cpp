@@ -28,6 +28,18 @@ ASkeletonCannonPawn::ASkeletonCannonPawn()
     this->SceneSpawnBullet->SetupAttachment(this->RootScene);
 }
 
+void ASkeletonCannonPawn::StopFireCannon()
+{
+    this->StateSkeletonCannon = EStateSkeletonCannon::Idle;
+    GetWorldTimerManager().ClearTimer(this->TimerAnimFR);
+}
+
+void ASkeletonCannonPawn::StartFireCannon()
+{
+    this->StateSkeletonCannon = EStateSkeletonCannon::Reload;
+    GetWorld()->GetTimerManager().SetTimer(this->TimerAnimFR, this, &ASkeletonCannonPawn::SwapAnimState, this->TimeRateReload, false);
+}
+
 // Called when the game starts or when spawned
 void ASkeletonCannonPawn::BeginPlay()
 {
@@ -81,7 +93,8 @@ void ASkeletonCannonPawn::SpawnBulletFromNotify()
     {
         TempBullet->SetShotDirection(Direction);
         TempBullet->FinishSpawning(SpawnTransform);
-        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->EffectShot, this->SceneSpawnBullet->GetComponentLocation(), FRotator(0.f, 0.f,-90.f));
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(), this->EffectShot, this->SceneSpawnBullet->GetComponentLocation(), FRotator(0.f, 0.f, -90.f));
         UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Skeleton Cannon: %s | Bullet: %s | Location: %s | is spawning"), *GetName(),
             *TempBullet->GetName(), *SpawnTransform.GetLocation().ToString());
     }

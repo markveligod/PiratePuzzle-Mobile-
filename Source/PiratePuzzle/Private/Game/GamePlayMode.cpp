@@ -1,9 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Game/GamePlayMode.h"
-
 #include "Components/CapsuleComponent.h"
 #include "Game/AI/Pirate/PirateAICharacter.h"
+#include "Game/AI/SkeletonCannon/SkeletonCannonPawn.h"
 #include "Game/AI/SkeletonRunner/SkeletonRunnerCharacter.h"
 #include "Game/Camera/CameraPawn.h"
 #include "Game/Camera/CameraPlayerController.h"
@@ -58,9 +58,16 @@ void AGamePlayMode::OnChangeGameState(EGameState NewState)
         return;
     }
 
-    if (NewState == EGameState::GameOver || NewState == EGameState::GameWin)
+    if (NewState != EGameState::GameProgress)
     {
         this->StopAllSkeletonRunner();
+        this->StopAllSkeletonCannon();
+    }
+
+    if (NewState == EGameState::GameProgress)
+    {
+        this->StartAllSkeletonRunner();
+        this->StartAllSkeletonCannon();
     }
 
     this->GameState = NewState;
@@ -97,6 +104,8 @@ void AGamePlayMode::StartPlay()
     GetWorldTimerManager().SetTimer(TimerSpawnSkeletonRunner, this, &AGamePlayMode::SpawnSkeletonRunner, 4.f, false);
     GetWorldTimerManager().SetTimer(TimerSpawnGold, this, &AGamePlayMode::SpawnGold, 5.f, false);
 
+    BaseUtils::FillArrayActorOfClass<ASkeletonCannonPawn>(GetWorld(), ASkeletonCannonPawn::StaticClass(), this->ArraySkeletonCannon);
+
     this->OnChangeGameState(EGameState::Loading);
     this->OnChangeGameStateTimer(EGameState::StartInfo, 6.f);
 }
@@ -110,6 +119,34 @@ void AGamePlayMode::StopAllSkeletonRunner()
         TempRunner->GetCharacterMovement()->StopActiveMovement();
     }
     UE_LOG(LogGamePlayMode, Display, TEXT("All skeleton runners is stop movement"));
+}
+
+void AGamePlayMode::StopAllSkeletonCannon()
+{
+    for (const auto TempCannon : this->ArraySkeletonCannon)
+    {
+        TempCannon->StopFireCannon();
+    }
+    UE_LOG(LogGamePlayMode, Display, TEXT("All skeleton cannon is stop shoot"));
+}
+
+void AGamePlayMode::StartAllSkeletonRunner()
+{
+    TArray<ASkeletonRunnerCharacter*> TempArraySkeletonRunners = this->GridGeneratorPlatform->GetArraySkeletonRunners();
+    for (const auto TempRunner : TempArraySkeletonRunners)
+    {
+        TempRunner->SetNewStateAISkeletonRunner(EStateAI::Walk);
+    }
+    UE_LOG(LogGamePlayMode, Display, TEXT("All skeleton runners is start movement"));
+}
+
+void AGamePlayMode::StartAllSkeletonCannon()
+{
+    for (const auto TempCannon : this->ArraySkeletonCannon)
+    {
+        TempCannon->StartFireCannon();
+    }
+    UE_LOG(LogGamePlayMode, Display, TEXT("All skeleton cannon is start shoot"));
 }
 
 void AGamePlayMode::SpawnPlatform()
@@ -174,5 +211,5 @@ void AGamePlayMode::ResetDead()
 void AGamePlayMode::IncreaseCountCoin()
 {
     this->CountCoin++;
-    this->OnCoinIncrease.Execute(this->CountCoin);
+    this->OnCoinIncrease.Broadcast(this->CountCoin);
 }

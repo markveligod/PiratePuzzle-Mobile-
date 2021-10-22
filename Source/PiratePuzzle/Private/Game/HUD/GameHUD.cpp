@@ -92,6 +92,7 @@ void AGameHUD::OnChangeGameState(EGameState NewState)
     // Play end animation if widget != nullptr
     if (this->WidgetOnVisible)
     {
+        this->WidgetOnVisible->DisableButtonActive();
         this->WidgetOnVisible->ShowAnim(this->WidgetOnVisible->GetEndAnim());
         FTimerDelegate TempDelegate;
         TempDelegate.BindUFunction(this, "ChangeOnNewWidget", NewState);

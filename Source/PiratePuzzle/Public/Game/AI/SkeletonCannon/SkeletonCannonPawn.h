@@ -22,6 +22,12 @@ public:
     UFUNCTION(BlueprintCallable)
     EStateSkeletonCannon GetStateSkeletonCannon() const { return (this->StateSkeletonCannon); }
 
+    // Stop firing the cannon
+    void StopFireCannon();
+
+    // Start firing the cannon
+    void StartFireCannon();
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
