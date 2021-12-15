@@ -20,19 +20,21 @@ public:
     // Sets default values for this actor's properties
     ABulletActor();
 
-    // Set new direction
-    void SetShotDirection(FVector NormalDirection) { this->DirectionBullet = NormalDirection; }
+    // Set Shot direction to projectile movement
+    void SetShotDirection(FVector NormalDirection);
 
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
+    // Register overlap with pirate
+    virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
 private:
     // Pointer on Current Game play mode
+    UPROPERTY()
     AGamePlayMode* GameMode;
 
-    // Direction variable
-    FVector DirectionBullet;
     // Root Scene
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
     USceneComponent* SceneRoot;
@@ -54,9 +56,4 @@ private:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings spawn",
         meta = (AllowPrivateAccess = true, ToolTip = "The effect after the destruction of the core in a collision"))
     UNiagaraSystem* EffectDestroy;
-
-    // Register overlap with pirate
-    UFUNCTION()
-    void OnRegisterCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-        int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

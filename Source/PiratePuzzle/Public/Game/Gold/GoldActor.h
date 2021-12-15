@@ -7,6 +7,8 @@
 #include "Game/GameDataTypes.h"
 #include "GoldActor.generated.h"
 
+class UPPGameInstance;
+class USoundCue;
 class UNiagaraSystem;
 class AGamePlayMode;
 class USphereComponent;
@@ -28,9 +30,14 @@ protected:
     virtual void BeginPlay() override;
 
 private:
+    // Current pointer on
+    UPROPERTY()
+    UPPGameInstance* GameInstance;
+
     // Current Game mode
+    UPROPERTY()
     AGamePlayMode* GameMode;
-    
+
     // Root Scene component
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
     USceneComponent* RootScene;
@@ -40,7 +47,7 @@ private:
     // The visual effect of the coin
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
     UNiagaraComponent* EffectCoin;
-    
+
     /*
      * A set of parameters for determining the internal animation of a coin
      */
@@ -58,25 +65,34 @@ private:
     FIntervalFloat SpeedMove{20.f, 100.f};
 
     // Enable debug information
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold",
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold|Debug",
         meta = (AllowPrivateAccess = true, ToolTip = "Enable debug inforamtion."))
     bool EnableDebugInfo = true;
     // Color debug trace
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold",
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold|Debug",
         meta = (AllowPrivateAccess = true, ToolTip = "Color debug trace.", EditCondition = "EnableDebugInfo"))
     FColor ColorTrace = FColor::Red;
     // Thickness debug trace
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold",
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold|Debug",
         meta = (AllowPrivateAccess = true, ToolTip = "Thickness debug trace.", EditCondition = "EnableDebugInfo"))
     float ThicknessTrace = 5.f;
     // Radius debug sphere
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold",
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold|Debug",
         meta = (AllowPrivateAccess = true, ToolTip = "Radius debug sphere.", EditCondition = "EnableDebugInfo"))
     float RadiusSphere = 5.f;
     // Segments debug sphere
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold",
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold|Debug",
         meta = (AllowPrivateAccess = true, ToolTip = "Segments debug sphere.", EditCondition = "EnableDebugInfo"))
     int32 SegmentsSphere = 5;
+
+    // Sound for magic coin
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Gold|Audio",
+        meta = (AllowPrivateAccess = true, ToolTip = "Segments debug sphere."))
+    USoundCue* SoundCoin;
+
+    // Anim pirate on take gold
+    UPROPERTY(EditDefaultsOnly, Category = "Settings Gold")
+    UAnimMontage* TakeGoldAnim;
 
     FVector GlobalStartLocation;
     FVector GlobalEndLocation;
@@ -86,7 +102,6 @@ private:
 
     // Function for registering a collision intersection
     UFUNCTION()
-    void OnRegisterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+    void OnRegisterBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+        int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
-
-

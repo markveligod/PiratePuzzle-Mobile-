@@ -1,7 +1,6 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
 #include "Game/Grid/GridGeneratorActor.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -11,11 +10,9 @@
 #include "Game/Grid/GridNeutralPlatform.h"
 #include "Game/Grid/GridQuicksandPlatform.h"
 #include "Game/Grid/GridTreasurePlatform.h"
-#include "Game/AI/Pirate/PirateAICharacter.h"
-#include "Game/AI/Pirate/PirateAIController.h"
+#include "Game/AI/Pirate/PiratePawn.h"
+#include "Game/AI/SkeletonRunner/SkeletonRunnerPawn.h"
 #include "Game/Camera/CameraPawn.h"
-#include "Game/AI/SkeletonRunner/SkeletonRunnerCharacter.h"
-#include "Game/AI/SkeletonRunner/SkeletonRunnerAIController.h"
 #include "Game/Gold/GoldActor.h"
 
 // Declaring a static variable for logging
@@ -43,6 +40,7 @@ void AGridGeneratorActor::BeginPlay()
     checkf(this->RootScene, TEXT("Root Scene component is nullptr"));
     checkf(this->StaticMeshHandleComponent, TEXT("Static Mesh Handle component is nullptr"));
     this->ClearGrid();
+    this->StaticMeshHandleComponent->SetVisibility(false);
 }
 
 void AGridGeneratorActor::OnConstruction(const FTransform& Transform)
@@ -61,9 +59,9 @@ void AGridGeneratorActor::SpawnPlatform()
 {
     for (int32 i = 0; i < this->HeightCount; i++)
     {
-        int32 j = 0;
-        const FVector ZeroWidthPosition = (j == 0) ? GetActorLocation() : BaseUtils::GetZeroPositionOnGrid(i, this->MapPlatformsOnGrid);
-        for (j; j < this->WidthCount; j++)
+        int32 TempJ = 0;
+        const FVector ZeroWidthPosition = (TempJ == 0) ? GetActorLocation() : BaseUtils::GetZeroPositionOnGrid(i, this->MapPlatformsOnGrid);
+        for (int32 j = TempJ; j < this->WidthCount; TempJ = ++j)
         {
             FIntPoint TempPoint(j, i);
             FVector NewLocation = FVector(ZeroWidthPosition.X + (this->DistancePlatform * j),
@@ -178,12 +176,16 @@ void AGridGeneratorActor::SpawnPirate()
         FVector SpawnPos = TempPlatform->GetActorLocation();
         SpawnPos.Z += this->AddPiratePosZ;
 
-        FRotator TempRot = FRotator(0.f, this->PirateRotZ, 0.f);
+        const FRotator TempRot = FRotator(0.f, this->PirateRotZ, 0.f);
 
-        this->AIPirate = Cast<APirateAICharacter>(
-            UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), this->SpawnPirateRef, nullptr, SpawnPos, TempRot));
+        FTransform TempTransform;
+        TempTransform.SetLocation(SpawnPos);
+        TempTransform.SetRotation(TempRot.Quaternion());
+
+        this->AIPirate = GetWorld()->SpawnActorDeferred<APiratePawn>(this->SpawnPirateRef, TempTransform);
         if (!this->AIPirate) return;
-        this->AIPirate->SetNewPosPlayer(this->PosPirate);
+        this->AIPirate->SetNewPoint(this->PosPirate);
+        this->AIPirate->FinishSpawning(TempTransform);
         UE_LOG(LogGridGeneratorActor, Display, TEXT("AI pirate: %s spawned on %s position platform"), *this->AIPirate->GetName(),
             *this->PosPirate.ToString());
 
@@ -196,19 +198,27 @@ void AGridGeneratorActor::SpawnPirate()
 
 void AGridGeneratorActor::SpawnSkeletonRunners()
 {
-    for (auto TempInfoSpawn : this->ArrayInfoSpawnSkeletonRunners)
+    for (const auto TempInfoSpawn : this->ArrayInfoSpawnSkeletonRunners)
     {
         const auto TempPlatform = this->MapPlatformsOnGrid[TempInfoSpawn.SpawnLocation];
         FVector SpawnPos = TempPlatform->GetActorLocation();
         SpawnPos.Z += this->AddSkeletonRunnerPosZ;
 
-        FRotator TempRot = FRotator(0.f, TempInfoSpawn.RotAxisZ, 0.f);
+        const FRotator TempRot = FRotator(0.f, TempInfoSpawn.RotAxisZ, 0.f);
 
-        auto TempSkeletonRunner = Cast<ASkeletonRunnerCharacter>(
-            UAIBlueprintHelperLibrary::SpawnAIFromClass(GetWorld(), this->SpawnSkeletonRunnerRef, nullptr, SpawnPos, TempRot));
+        FTransform TempTransform;
+        TempTransform.SetLocation(SpawnPos);
+        TempTransform.SetRotation(TempRot.Quaternion());
+
+        ASkeletonRunnerPawn* TempSkeletonRunner =
+            GetWorld()->SpawnActorDeferred<ASkeletonRunnerPawn>(this->SpawnSkeletonRunnerRef, TempTransform);
         if (!TempSkeletonRunner) return;
-        UE_LOG(LogGridGeneratorActor, Display, TEXT("AI Skeleton Runners: %s spawned"), *TempSkeletonRunner->GetName());
+
         TempSkeletonRunner->ArrayPointLocation = TempInfoSpawn.RoadRoute;
+        TempSkeletonRunner->RangeWaitMove = TempInfoSpawn.RangeStopMove;
+        TempSkeletonRunner->FinishSpawning(TempTransform);
+
+        UE_LOG(LogGridGeneratorActor, Display, TEXT("AI Skeleton Runners: %s spawned"), *TempSkeletonRunner->GetName());
         this->ArraySkeletonRunners.Add(TempSkeletonRunner);
     }
 }
@@ -242,46 +252,35 @@ void AGridGeneratorActor::ClearGrid()
     // Platform
     TArray<AGridPlatformActor*> ArrayPlatform;
     BaseUtils::FillArrayActorOfClass<AGridPlatformActor>(GetWorld(), AGridPlatformActor::StaticClass(), ArrayPlatform);
-    for (auto TempPlatfrom : ArrayPlatform)
+    for (const auto TempPlatfrom : ArrayPlatform)
         TempPlatfrom->Destroy();
     this->MapPlatformsOnGrid.Empty();
 
     // Wall
     TArray<AGridWallActor*> ArrayWall;
     BaseUtils::FillArrayActorOfClass<AGridWallActor>(GetWorld(), this->SpawnWallRef, ArrayWall);
-    for (auto TempWall : ArrayWall)
+    for (const auto TempWall : ArrayWall)
         TempWall->Destroy();
     this->WallsGrid.Empty();
 
     // Pirate
-    TArray<APirateAICharacter*> ArrayPirate;
-    BaseUtils::FillArrayActorOfClass<APirateAICharacter>(GetWorld(), this->SpawnPirateRef, ArrayPirate);
-    for (auto TempPirate : ArrayPirate)
+    TArray<APiratePawn*> ArrayPirate;
+    BaseUtils::FillArrayActorOfClass<APiratePawn>(GetWorld(), this->SpawnPirateRef, ArrayPirate);
+    for (const auto TempPirate : ArrayPirate)
         TempPirate->Destroy();
     this->AIPirate = nullptr;
 
-    TArray<APirateAIController*> ArrayController;
-    BaseUtils::FillArrayActorOfClass<APirateAIController>(GetWorld(), APirateAIController::StaticClass(), ArrayController);
-    for (auto TempController : ArrayController)
-        TempController->Destroy();
-
     // Skeleton Runners
-    TArray<ASkeletonRunnerCharacter*> ArraySkeletonRun;
-    BaseUtils::FillArrayActorOfClass<ASkeletonRunnerCharacter>(GetWorld(), this->SpawnSkeletonRunnerRef, ArraySkeletonRun);
-    for (auto TempSkeletonRunner : ArraySkeletonRun)
+    TArray<ASkeletonRunnerPawn*> ArraySkeletonRun;
+    BaseUtils::FillArrayActorOfClass<ASkeletonRunnerPawn>(GetWorld(), this->SpawnSkeletonRunnerRef, ArraySkeletonRun);
+    for (const auto TempSkeletonRunner : ArraySkeletonRun)
         TempSkeletonRunner->Destroy();
-
-    TArray<ASkeletonRunnerAIController*> ArraySkeletonController;
-    BaseUtils::FillArrayActorOfClass<ASkeletonRunnerAIController>(
-        GetWorld(), ASkeletonRunnerAIController::StaticClass(), ArraySkeletonController);
-    for (auto TempController : ArraySkeletonController)
-        TempController->Destroy();
     this->ArraySkeletonRunners.Empty();
 
     // Gold
     TArray<AGoldActor*> ArrayGold;
     BaseUtils::FillArrayActorOfClass<AGoldActor>(GetWorld(), this->SpawnGoldRef, ArrayGold);
-    for (auto TempGold : ArrayGold)
+    for (const auto TempGold : ArrayGold)
         TempGold->Destroy();
     this->ArrayGolds.Empty();
 }

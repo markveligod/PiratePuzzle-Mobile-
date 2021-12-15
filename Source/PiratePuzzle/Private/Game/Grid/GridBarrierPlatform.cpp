@@ -2,6 +2,7 @@
 
 #include "Game/Grid/GridBarrierPlatform.h"
 #include "Components/BoxComponent.h"
+#include "UtilsLib/LoaderUtils.h"
 
 AGridBarrierPlatform::AGridBarrierPlatform()
 {
@@ -13,6 +14,7 @@ AGridBarrierPlatform::AGridBarrierPlatform()
     // Create Base Mesh component
     this->BaseMeshBarrier = CreateDefaultSubobject<UStaticMeshComponent>("Base barrier static mesh");
     this->BaseMeshBarrier->SetupAttachment(GetRootComponent());
+    this->BaseMeshBarrier->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AGridBarrierPlatform::BeginPlay()
@@ -20,11 +22,14 @@ void AGridBarrierPlatform::BeginPlay()
     Super::BeginPlay();
     checkf(this->BoxCollision, TEXT("Box collision is nullptr"));
     checkf(this->BaseMeshBarrier, TEXT("Mesh Barrier is nullptr"));
-    checkf(this->ArrayMeshBarrier.Num() != 0, TEXT("Array Barrier size is 0"))
-        checkf(this->ArrayRotationBarrier.Num() != 0, TEXT("Array Barrier size is 0"))
+    checkf(this->ArrayMeshBarrier.Num() != 0, TEXT("Array Barrier size is 0"));
+    checkf(this->ArrayRotationBarrier.Num() != 0, TEXT("Array Barrier size is 0"));
 
-        // Random Set Mesh Barrier
-        this->BaseMeshBarrier->SetStaticMesh(this->ArrayMeshBarrier[FMath::RandRange(0, this->ArrayMeshBarrier.Num() - 1)]);
+    // Random Load and Set Mesh Barrier
+    UStaticMesh* NewMeshBarrier = LoaderUtils::LoaderSyncObject<UStaticMesh>(
+        GetWorld(), this->ArrayMeshBarrier[FMath::RandRange(0, this->ArrayMeshBarrier.Num() - 1)]);
+    this->BaseMeshBarrier->SetStaticMesh(NewMeshBarrier);
+
     // Random Rotation Mesh Barrier
     this->BaseMeshBarrier->SetRelativeRotation(this->ArrayRotationBarrier[FMath::RandRange(0, this->ArrayRotationBarrier.Num() - 1)]);
 }
@@ -32,8 +37,11 @@ void AGridBarrierPlatform::BeginPlay()
 void AGridBarrierPlatform::OnConstruction(const FTransform& Transform)
 {
     Super::OnConstruction(Transform);
-    // Random Set Mesh Barrier
-    this->BaseMeshBarrier->SetStaticMesh(this->ArrayMeshBarrier[FMath::RandRange(0, this->ArrayMeshBarrier.Num() - 1)]);
+    // Random Load and Set Mesh Barrier
+    UStaticMesh* NewMeshBarrier = LoaderUtils::LoaderSyncObject<UStaticMesh>(
+        GetWorld(), this->ArrayMeshBarrier[FMath::RandRange(0, this->ArrayMeshBarrier.Num() - 1)]);
+    this->BaseMeshBarrier->SetStaticMesh(NewMeshBarrier);
+
     // Random Rotation Mesh Barrier
     this->BaseMeshBarrier->SetRelativeRotation(this->ArrayRotationBarrier[FMath::RandRange(0, this->ArrayRotationBarrier.Num() - 1)]);
 }

@@ -34,7 +34,7 @@ private:
     // Array Static mesh for barrier
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Barrier",
         meta = (AllowPrivateAccess = "true", ToolTip = "A set of meshes for displaying the barrier"))
-    TArray<UStaticMesh*> ArrayMeshBarrier;
+    TArray<TAssetPtr<UStaticMesh>> ArrayMeshBarrier;
     // Array Rotation for barrier
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Barrier",
         meta = (AllowPrivateAccess = "true", ToolTip = "A set of turns to display the barrier"))

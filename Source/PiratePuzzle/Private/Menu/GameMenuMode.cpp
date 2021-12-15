@@ -1,6 +1,7 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
 #include "Menu/GameMenuMode.h"
+#include "PPGameInstance.h"
 #include "Menu/MenuHUD.h"
 #include "Menu/MenuPlayerController.h"
 
@@ -15,6 +16,11 @@ AGameMenuMode::AGameMenuMode()
 void AGameMenuMode::StartPlay()
 {
     Super::StartPlay();
+
+    this->GameInstance = Cast<UPPGameInstance>(GetWorld()->GetGameInstance());
+    checkf(this->GameInstance, TEXT("Game instance is nullptr"));
+
+    this->GameInstance->SetRunLevel(0);
 
     this->ChangeMenuState(EMenuState::Welcome);
 }
@@ -34,6 +40,13 @@ void AGameMenuMode::ChangeMenuState(EMenuState NewState)
 
 void AGameMenuMode::ChangeMenuStateTimer(EMenuState NewState, float RateTime)
 {
+    if (RateTime == 0.0f)
+    {
+        UE_LOG(LogGameMenuMode, Warning, TEXT("Call ChangeMenuStateTimer with 0.0f | Rate Timer: %f"), RateTime);
+        ChangeMenuState(NewState);
+        return;
+    }
+
     FTimerHandle TimerHandle;
     FTimerDelegate TimerDelegate;
     TimerDelegate.BindUObject(this, &AGameMenuMode::ChangeMenuState, NewState);

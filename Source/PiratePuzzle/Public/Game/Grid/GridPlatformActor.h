@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Game/GameDataTypes.h"
 #include "GameFramework/Actor.h"
-#include "Game/Grid/GridDataTypes.h"
 #include "GridPlatformActor.generated.h"
 
 class AGamePlayMode;
@@ -19,9 +17,6 @@ public:
     // Sets default values for this actor's properties
     AGridPlatformActor();
 
-    // Called every frame
-    virtual void Tick(float DeltaTime) override;
-
     // Getting position platform
     FIntPoint GetPositionPlatform() const { return (this->PlatformPos); }
 
@@ -32,6 +27,9 @@ protected:
     // Getting pointer on current game mode
     AGamePlayMode* GetGamePlayMode() const { return (this->GameMode); }
 
+    // Getting Base mesh platform
+    UStaticMeshComponent* GetMeshPlatform() const { return (this->BaseMeshPlatform); };
+
 private:
     // Pointer on Game mode
     AGamePlayMode* GameMode;
@@ -39,9 +37,9 @@ private:
     // Main scene root components
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     USceneComponent* SceneRoot;
-    // Static mesh item
+    // Base mesh platform
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-    UStaticMeshComponent* StaticMeshComponent;
+    UStaticMeshComponent* BaseMeshPlatform;
     // Debug position item on grid
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UTextRenderComponent* TextDebugPosition;

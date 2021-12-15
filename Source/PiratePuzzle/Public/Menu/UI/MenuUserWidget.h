@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MenuUserWidget.generated.h"
 
+class UPPGameInstance;
 class AGameMenuMode;
 /**
  *
@@ -19,7 +20,7 @@ public:
     // Is widget Active
     bool IsWidgetActive() const { return (this->bActiveWidget); }
     // Change widget activity
-    void ChangeActiveWidget(bool NewState) { this->bActiveWidget = NewState; }
+    virtual void ChangeActiveWidget(bool NewState) { this->bActiveWidget = NewState; }
     // Change widget activity on timer
     void ChangeActiveWidgetTimer(bool NewState, float RateTime);
 
@@ -30,14 +31,22 @@ public:
     void PlayAnimationTimer(UWidgetAnimation* Anim, float RateTime);
 
     // Mandatory animations for changing the menu state
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* StartAnim;
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
     UWidgetAnimation* EndAnim;
 
 protected:
-    // Getting game menu mode
+    // Getting current game menu mode
     AGameMenuMode* GetGameMenuMode() const { return (this->GameMode); }
+    // Getting current game instance
+    UPPGameInstance* GetPPGameInstance() const { return (this->GameInstance); }
+
+    // Starting the level by timer
+    void StartLevelTimer(FName NameLevel, float TimeRate);
+
+    // Play sound on Timer
+    void PlaySoundTimer(USoundBase* SoundToPlay, float RateTime);
 
     virtual void NativeOnInitialized() override;
 
@@ -45,6 +54,12 @@ private:
     // The current pointer to the game menu mode
     AGameMenuMode* GameMode;
 
+    // The current pointer to the Game Instance
+    UPPGameInstance* GameInstance;
+
     // Checking widget activity
     bool bActiveWidget = true;
+
+    // Starting a level without a timer
+    void StartLevel(FName NameLevel) const;
 };

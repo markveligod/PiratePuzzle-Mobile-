@@ -1,19 +1,18 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
 #include "Game/Grid/GridQuicksandPlatform.h"
-
 #include "NiagaraComponent.h"
 #include "Components/BoxComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Game/GamePlayMode.h"
-#include "Game/AI/Pirate/PirateAICharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
+#include "Game/AI/Pirate/PiratePawn.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGridQuicksandPlatform, All, All);
 
 AGridQuicksandPlatform::AGridQuicksandPlatform()
 {
+    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = true;
+
     // Create Box Collision
     this->BoxCollision = CreateDefaultSubobject<UBoxComponent>("Box Collision component");
     this->BoxCollision->SetupAttachment(GetRootComponent());
@@ -39,7 +38,7 @@ void AGridQuicksandPlatform::DiveAIPirate(float DeltaTime)
 {
     if (this->TimeElyps < this->RateTimeSand)
     {
-        float NewAxisZ = FMath::Lerp(this->StartPos, this->EndPos, this->TimeElyps / this->RateTimeSand);
+        const float NewAxisZ = FMath::Lerp(this->StartPos, this->EndPos, this->TimeElyps / this->RateTimeSand);
         FVector NewLoc = this->SuicideBomber->GetActorLocation();
         NewLoc.Z = NewAxisZ;
         this->SuicideBomber->SetActorLocation(NewLoc);
@@ -63,19 +62,18 @@ void AGridQuicksandPlatform::RegisterCollisionOverlap(UPrimitiveComponent* Overl
     }
     UE_LOG(LogGridQuicksandPlatform, Display, TEXT("Name Platform: %s | Position: %s | Name Actor overlap: %s"), *GetName(),
         *GetPositionPlatform().ToString(), *OtherActor->GetName());
-    if (OtherActor->IsA(APirateAICharacter::StaticClass()))
+    if (OtherActor->IsA(APiratePawn::StaticClass()))
     {
-        APirateAICharacter* TempPirate = Cast<APirateAICharacter>(OtherActor);
-        TempPirate->SetStateAI(EStateAI::DeathSand);
-        TempPirate->GetCharacterMovement()->StopActiveMovement();
+        APiratePawn* TempPirate = Cast<APiratePawn>(OtherActor);
+        TempPirate->StopMovement();
         TempPirate->SetActorLocation(this->BoxCollision->GetComponentLocation());
-        TempPirate->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        TempPirate->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+        TempPirate->GetCollision()->SetCollisionProfileName("NoCollision");
+        TempPirate->ChangeStateBrain(EStateBrain::Sand);
 
         this->SuicideBomber = TempPirate;
         this->StartPos = TempPirate->GetActorLocation().Z;
         this->EndPos = this->StartPos - this->Depth;
         this->bEnableDepth = true;
-        GetGamePlayMode()->OnChangeGameStateTimer(EGameState::GameOver);
+        GetGamePlayMode()->OnChangeGameStateTimer(EGameState::GameOver, RateTimeSand);
     }
 }

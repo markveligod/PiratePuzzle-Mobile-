@@ -4,11 +4,12 @@
 #include "Game/GamePlayMode.h"
 #include "DrawDebugHelpers.h"
 #include "Components/SphereComponent.h"
-#include "Game/AI/Pirate/PirateAICharacter.h"
 #include "UtilsLib/BaseUtils.h"
 #include "NiagaraComponent.h"
-#include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "PPGameInstance.h"
+#include "Game/AI/Pirate/PiratePawn.h"
+#include "Sound/SoundCue.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGoldActor, All, All);
 
@@ -40,30 +41,36 @@ void AGoldActor::BeginPlay()
     checkf(this->SphereCollision, TEXT("Sphere collision is nullptr"));
     this->GameMode = Cast<AGamePlayMode>(GetWorld()->GetAuthGameMode());
     checkf(this->GameMode, TEXT("Game mode is nullptr"));
+    this->GameInstance = Cast<UPPGameInstance>(GetWorld()->GetGameInstance());
+    checkf(this->GameInstance, TEXT("Game instance is nullptr"));
 
     this->GlobalStartLocation = this->GlobalEndLocation = GetActorLocation();
     this->GlobalEndLocation.Z += this->AddMovementAxisZ;
 
     this->SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AGoldActor::OnRegisterBeginOverlap);
+
+    // Test spawn niagara
+    if (this->GameInstance->GetRunLevel() == 1)
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->DestructionEffect, GetActorLocation());
 }
 
 void AGoldActor::MoveLocationCoin(float DeltaTime)
 {
     FVector Location = GetActorLocation();
     // General size
-    float JourneyLength = (this->GlobalEndLocation - this->GlobalStartLocation).Size();
+    const float JourneyLength = (this->GlobalEndLocation - this->GlobalStartLocation).Size();
     // Size from start location to current location cube
-    float JourneyTravelled = (Location - GlobalStartLocation).Size();
-    float HalfSize = JourneyLength / 2.f;
+    const float JourneyTravelled = (Location - GlobalStartLocation).Size();
+    const float HalfSize = JourneyLength / 2.f;
 
     // if current location current platform > general size => Swap
     if (JourneyTravelled >= JourneyLength) BaseUtils::SwapData<FVector>(this->GlobalStartLocation, this->GlobalEndLocation);
-    FVector DirectionMove = (GlobalEndLocation - GlobalStartLocation).GetSafeNormal();
+    const FVector DirectionMove = (GlobalEndLocation - GlobalStartLocation).GetSafeNormal();
 
-    float Ratio = (FMath::Abs<float>(JourneyTravelled - HalfSize)) / HalfSize;
+    const float Ratio = (FMath::Abs<float>(JourneyTravelled - HalfSize)) / HalfSize;
     // UE_LOG(LogGoldActor, Display, TEXT("Name Gold: %s | Ratio: %f | Journey Travelled: %f | HalfSize: %f"), *GetName(), Ratio,
     // JourneyTravelled, HalfSize);
-    float Speed = FMath::Lerp(this->SpeedMove.Min, this->SpeedMove.Max, Ratio);
+    const float Speed = FMath::Lerp(this->SpeedMove.Min, this->SpeedMove.Max, Ratio);
 
     Location += Speed * DeltaTime * DirectionMove;
     SetActorLocation(Location);
@@ -93,10 +100,13 @@ void AGoldActor::OnRegisterBeginOverlap(UPrimitiveComponent* OverlappedComponent
     }
 
     // Pirate overlap
-    if (OtherActor->IsA(APirateAICharacter::StaticClass()))
+    if (OtherActor->IsA(APiratePawn::StaticClass()))
     {
+        APiratePawn* Pirate = Cast<APiratePawn>(OtherActor);
+        Pirate->PlayAnimMontage(this->TakeGoldAnim);
         this->GameMode->IncreaseCountCoin();
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->DestructionEffect, GetActorLocation());
+        UGameplayStatics::PlaySound2D(GetWorld(), this->SoundCoin);
         Destroy();
     }
 }

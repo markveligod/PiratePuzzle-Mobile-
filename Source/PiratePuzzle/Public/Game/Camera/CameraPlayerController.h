@@ -21,6 +21,7 @@ protected:
 
 private:
     // Pointer on current Game mode
+    UPROPERTY()
     AGamePlayMode* GameMode;
 
     // Function for accepting a new state

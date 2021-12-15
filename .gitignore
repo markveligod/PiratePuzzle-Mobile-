@@ -16,12 +16,8 @@ Plugins/*/Intermediate/*
 *_BuiltData.uasset
 
 # Build
-/Build/Android_ASTC
-/Build/Android_ETC2
-/Build/Android_Multi
-/Build/Android_DXT
+/Build/Android_*
 
-# Raw content
-/RawContent/**/* 
+# Other
 /Devops/config.bat
 /PiratePuzzle.sln.DotSettings.user

@@ -7,8 +7,8 @@
 #include "Game/Camera/CameraDataTypes.h"
 #include "CameraPawn.generated.h"
 
+class APiratePawn;
 class AGamePlayMode;
-class APirateAICharacter;
 class USpringArmComponent;
 class UCameraComponent;
 class USphereComponent;
@@ -28,7 +28,7 @@ public:
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
     // Set AI pirate
-    void SetAIPirate(APirateAICharacter* Pirate) { this->AIPlayer = Pirate; }
+    void SetAIPirate(APiratePawn* Pirate) { this->AIPirate = Pirate; }
 
     // Run move ai character
     void StartMoveAICharacterOnPos(FIntPoint NewPoint);
@@ -38,13 +38,18 @@ public:
     void StartSwapCamera();
 
     // Getting pointer on AI pirate
-    APirateAICharacter* GetAIPirate() const { return (this->AIPlayer); }
+    UFUNCTION(BlueprintCallable, Category = "ACameraPawn", meta = (ToolTip = "Getting pointer on AI pirate"))
+    APiratePawn* GetAIPirate() const { return (this->AIPirate); }
+
+    // Setup Direction player
+    void SetupDirectionPlayer(EDirectionPlayer NewDirection) { this->DirectionPlayer = NewDirection; }
 
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
 private:
+    UPROPERTY()
     AGamePlayMode* GameMode;
 
     // root Scene component
@@ -78,7 +83,8 @@ private:
     // Map base rotation player for trace calculate direction
     TMap<EDirectionPlayer, FInfoTrace> BaseRotationPlayer;
     // Pointer ai player for controlled
-    APirateAICharacter* AIPlayer;
+    UPROPERTY()
+    APiratePawn* AIPirate;
 
     /*
      * Debug line trace from pirate
@@ -137,10 +143,13 @@ private:
 
     // Pack function for register touch of the finger
     void OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location);
+    void OnTouchRepeat(ETouchIndex::Type FingerIndex, FVector Location);
     void OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Location);
 
+    // Checking registration parameters
+    bool CheckRegisterTouch(const FVector2D& Start, const FVector2D& End);
     // Calculation of values for determining the current direction of the player
-    bool UpdateDirectionForPlayer();
+    EDirectionPlayer UpdateDirectionForPlayer(const FVector2D& Start, const FVector2D& End);
     // Find new Location
     FIntPoint TryFindNewPointLocation();
     // TryGetTrace

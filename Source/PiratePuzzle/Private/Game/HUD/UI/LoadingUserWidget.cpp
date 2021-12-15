@@ -1,7 +1,6 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
 #include "Game/HUD/UI/LoadingUserWidget.h"
-
 #include "Components/Image.h"
 #include "GameFramework/GameUserSettings.h"
 

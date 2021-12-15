@@ -1,15 +1,14 @@
 // Pirate Puzzle. Contact: markveligod@gmail.com
 
 #include "Game/Camera/CameraPawn.h"
-
 #include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SphereComponent.h"
 #include "Game/GamePlayMode.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Game/AI/Pirate/PirateAICharacter.h"
+#include "Game/AI/Pirate/PiratePawn.h"
 #include "Game/Grid/GridGeneratorActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Game/Grid/GridPlatformActor.h"
@@ -81,18 +80,41 @@ void ACameraPawn::ChangeCameraPosition(float DeltaTime)
 
 void ACameraPawn::OnTouchPressed(ETouchIndex::Type FingerIndex, FVector Location)
 {
+    if (FingerIndex != ETouchIndex::Touch1) return;
     this->StartTouch.X = Location.X;
     this->StartTouch.Y = Location.Y;
 }
 
+void ACameraPawn::OnTouchRepeat(ETouchIndex::Type FingerIndex, FVector Location)
+{
+    if (FingerIndex != ETouchIndex::Touch1) return;
+    if (!this->AIPirate) return;
+    if (this->GameMode->GetGameState() != EGameState::GameProgress) return;
+    if (this->AIPirate->GetStateBrain() != EStateBrain::Idle) return;
+
+    this->EndTouch.X = Location.X;
+    this->EndTouch.Y = Location.Y;
+    EDirectionPlayer NewDirection = this->UpdateDirectionForPlayer(this->StartTouch, this->EndTouch);
+    if (this->DirectionPlayer != NewDirection)
+    {
+        this->DirectionPlayer = NewDirection;
+        UE_LOG(LogCameraPawn, Display, TEXT("Update direction player: %s"), *UEnum::GetValueAsString(this->DirectionPlayer))
+        this->AIPirate->SetActorRotation(this->BaseRotationPlayer[this->DirectionPlayer].RotationPlayer);
+    }
+}
+
 void ACameraPawn::OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Location)
 {
+    if (FingerIndex != ETouchIndex::Touch1) return;
     this->EndTouch.X = Location.X;
     this->EndTouch.Y = Location.Y;
 
-    if (!this->AIPlayer) return;
-    if (this->AIPlayer->GetStateAI() != EStateAI::Idle) return;
-    if (!this->UpdateDirectionForPlayer()) return;
+    if (!this->AIPirate) return;
+    if (this->GameMode->GetGameState() != EGameState::GameProgress) return;
+    if (this->AIPirate->GetStateBrain() != EStateBrain::Idle) return;
+
+    // Check register touch
+    if (!this->CheckRegisterTouch(this->StartTouch, this->EndTouch)) return;
 
     FIntPoint NewPointLocation;
     if ((NewPointLocation = this->TryFindNewPointLocation()) == FIntPoint(-1, -1))
@@ -103,20 +125,35 @@ void ACameraPawn::OnTouchReleased(ETouchIndex::Type FingerIndex, FVector Locatio
     this->StartMoveAICharacterOnPos(NewPointLocation);
 }
 
+bool ACameraPawn::CheckRegisterTouch(const FVector2D& Start, const FVector2D& End)
+{
+    const auto LengthRegister = UKismetMathLibrary::VSize2D(FVector2D(End.X - Start.X, End.Y - Start.Y));
+
+    if (LengthRegister < this->LenSizeTouch)
+    {
+        UE_LOG(LogCameraPawn, Error, TEXT("Length Register: %f less define len register:  %f"), LengthRegister, this->LenSizeTouch);
+        return (false);
+    }
+    return (true);
+}
+
 void ACameraPawn::StartMoveAICharacterOnPos(FIntPoint NewPoint)
 {
-    if (this->AIPlayer->GetStateAI() == EStateAI::Walk) return;
+    if (this->AIPirate->GetStateBrain() == EStateBrain::Walk) return;
 
+    // Adding one successful move
+    this->GameMode->AddCountMoves();
+
+    // Setting up a new position for a pirate
     auto TempMap = this->GameMode->GetGridGenerator()->GetMapPlatformOnGrid();
     FVector NewPos = BaseUtils::GetVectorPositionPlatform(NewPoint, TempMap);
-    this->AIPlayer->SetNextLocation(NewPos);
-    this->AIPlayer->SetNewPosPlayer(NewPoint);
-    this->AIPlayer->SetStateAI(EStateAI::Walk);
+    this->AIPirate->SetNewPoint(NewPoint);
+    this->AIPirate->StartMovement(this->AIPirate->GetActorLocation(), NewPos);
 }
 
 void ACameraPawn::StartSwapCamera()
 {
-    if (this->AIPlayer->GetStateAI() != EStateAI::Idle && this->AIPlayer->GetStateAI() != EStateAI::Walk) return;
+    if (this->AIPirate->GetStateBrain() != EStateBrain::Idle && this->AIPirate->GetStateBrain() != EStateBrain::Walk) return;
     if (this->EnableAnimCamera) return;
 
     this->StartRot = (this->IsCameraUp == true) ? this->RotUpCamera : this->RotDefaultCamera;
@@ -127,37 +164,29 @@ void ACameraPawn::StartSwapCamera()
     UE_LOG(LogCameraPawn, Display, TEXT("Start animation camera from %s to %s"), *this->StartRot.ToString(), *this->EndRot.ToString());
 }
 
-bool ACameraPawn::UpdateDirectionForPlayer()
+EDirectionPlayer ACameraPawn::UpdateDirectionForPlayer(const FVector2D& Start, const FVector2D& End)
 {
-    const auto NoAbsVector = FVector2D(this->StartTouch.X - this->EndTouch.X, this->StartTouch.Y - this->EndTouch.Y);
-    const auto AbsVector = FVector2D(FMath::Abs(this->StartTouch.X - this->EndTouch.X), FMath::Abs(this->StartTouch.Y - this->EndTouch.Y));
-    const auto LengthRegister =
-        UKismetMathLibrary::VSize2D(FVector2D(this->EndTouch.X - this->StartTouch.X, this->EndTouch.Y - this->StartTouch.Y));
-
-    if (LengthRegister < this->LenSizeTouch)
-    {
-        UE_LOG(LogCameraPawn, Error, TEXT("Length Register: %f less define len register:  %f"), LengthRegister, this->LenSizeTouch);
-        return (false);
-    }
+    EDirectionPlayer NewDirectionPlayer;
+    const auto NoAbsVector = FVector2D(Start.X - End.X, Start.Y - End.Y);
+    const auto AbsVector = FVector2D(FMath::Abs(Start.X - End.X), FMath::Abs(Start.Y - End.Y));
 
     if (AbsVector.X > AbsVector.Y)  // left or right
     {
-        this->DirectionPlayer = (NoAbsVector.X > 0) ? EDirectionPlayer::Left : EDirectionPlayer::Right;
+        NewDirectionPlayer = (NoAbsVector.X > 0) ? EDirectionPlayer::Left : EDirectionPlayer::Right;
     }
     else  // up or down
     {
-        this->DirectionPlayer = (NoAbsVector.Y > 0) ? EDirectionPlayer::Up : EDirectionPlayer::Down;
+        NewDirectionPlayer = (NoAbsVector.Y > 0) ? EDirectionPlayer::Up : EDirectionPlayer::Down;
     }
-    UE_LOG(LogCameraPawn, Display, TEXT("Registered direction player: %s"), *UEnum::GetValueAsString(this->DirectionPlayer));
-    return (true);
+    return (NewDirectionPlayer);
 }
 
 FIntPoint ACameraPawn::TryFindNewPointLocation()
 {
-    FVector StartLine = this->AIPlayer->GetCapsuleComponent()->GetComponentLocation();
+    FVector StartLine = this->AIPirate->GetCollision()->GetComponentLocation();
     FVector EndLine = StartLine + this->BaseRotationPlayer[this->DirectionPlayer].RotationPlayer.Vector() * this->DistanceTrace;
 
-    FCollisionQueryParams FirstParams(FName(TEXT("param")), false, GetOwner());
+    FCollisionQueryParams FirstParams(FName(TEXT("param")), false, this->AIPirate);
     FCollisionObjectQueryParams FirstObjectParams(ECollisionChannel::ECC_WorldStatic);
 
     FHitResult FirstTrace = this->TryGetTrace(StartLine, EndLine, FirstParams, FirstObjectParams);
@@ -169,6 +198,7 @@ FIntPoint ACameraPawn::TryFindNewPointLocation()
         FVector BlockLocationStart = FirstTrace.ImpactPoint;
         BlockLocationStart += this->BaseRotationPlayer[this->DirectionPlayer].TraceLocation;
         FVector BlockLocationEnd = BlockLocationStart + (FRotator(-90.f, 0.f, 0.f)).Vector() * this->DistanceTrace;
+
         // Draw debug trace
         if (this->bEnableDebugTrace)
         {
@@ -176,8 +206,8 @@ FIntPoint ACameraPawn::TryFindNewPointLocation()
             DrawDebugSphere(GetWorld(), BlockLocationStart, this->RadiusSphere, this->SegmentsSphere, this->ColorTrace, false,
                 this->TimeLifeTrace, 0, this->ThicknessTrace);
         }
-        FCollisionQueryParams SecondParams(FName(TEXT("param")), false, GetOwner());
-        FCollisionObjectQueryParams SecondObjectParams(ECollisionChannel::ECC_OverlapAll_Deprecated);
+        FCollisionQueryParams SecondParams(FName(TEXT("param")), false, this->AIPirate);
+        FCollisionObjectQueryParams SecondObjectParams(ECollisionChannel::ECC_WorldStatic);
 
         FHitResult SecondTrace = this->TryGetTrace(BlockLocationStart, BlockLocationEnd, SecondParams, SecondObjectParams);
         if (SecondTrace.IsValidBlockingHit() && SecondTrace.GetActor())
@@ -197,13 +227,11 @@ FIntPoint ACameraPawn::TryFindNewPointLocation()
             if (!TempPlatform) return (FIntPoint(-1, -1));
 
             const FIntPoint TempPosPlatform = TempPlatform->GetPositionPlatform();
-            const FIntPoint TempPosAICharacter = this->AIPlayer->GetPosPlayer();
+            const FIntPoint TempPosPirate = this->AIPirate->GetPointPosition();
 
-            if (TempPosPlatform == TempPosAICharacter) return (FIntPoint(-1, -1));
-
-            FIntPoint BeforePos = this->AIPlayer->GetPosPlayer();
-            if (BeforePos != FIntPoint(-1, -1)) this->AIPlayer->AddBeforePos(BeforePos);
-            UE_LOG(LogCameraPawn, Display, TEXT("New Position AI player: %s"), *TempPosPlatform.ToString());
+            if (TempPosPlatform == TempPosPirate) return (FIntPoint(-1, -1));
+            this->AIPirate->AddPreviousPointPosition(TempPosPirate);
+            UE_LOG(LogCameraPawn, Display, TEXT("New Position AI pirate: %s"), *TempPosPlatform.ToString());
             return (TempPosPlatform);
         }
     }
@@ -233,6 +261,7 @@ void ACameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
     if (PlayerInputComponent)
     {
         PlayerInputComponent->BindTouch(IE_Pressed, this, &ACameraPawn::OnTouchPressed);
+        PlayerInputComponent->BindTouch(IE_Repeat, this, &ACameraPawn::OnTouchRepeat);
         PlayerInputComponent->BindTouch(IE_Released, this, &ACameraPawn::OnTouchReleased);
     }
 }

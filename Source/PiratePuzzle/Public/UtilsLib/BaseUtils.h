@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#include "Containers/UnrealString.h"
+#include "CoreMinimal.h"
+#include "Menu/MenuDataTypes.h"
 #include "Game/Grid/GridPlatformActor.h"
 #include "Kismet/GameplayStatics.h"
-#include "Math/Vector.h"
 
 class BaseUtils
 {
 public:
-    // Return the string from bool
+    // Return the string from bool | true == FString("True") | false == FString("False")
     static FString GetStringFromBool(bool State)
     {
         if (State) return (FString("True"));
@@ -51,5 +51,35 @@ public:
         Data TempData = Data1;
         Data1 = Data2;
         Data2 = TempData;
+    }
+
+    // Determines the status of the level depending on the number of levels
+    static ELevelState GetLevelStateFromCoin(const int32 CountCoin)
+    {
+        if (CountCoin == 1) return (ELevelState::OneGold);
+        if (CountCoin == 2) return (ELevelState::TwoGold);
+        if (CountCoin == 3) return (ELevelState::ThreeGold);
+        return (ELevelState::ZeroGold);
+    }
+
+    // Get string minute from second
+    static FString GetStringMinute(int32 ValueSec)
+    {
+        if (ValueSec == 0) return (FString(""));
+
+        FString Result;
+        int32 ValueMinute = 0;
+
+        while (ValueSec >= 60)
+        {
+            ValueMinute++;
+            ValueSec -= 60;
+        }
+
+        Result += (ValueMinute > 9) ? FString::FromInt(ValueMinute) : FString("0") + FString::FromInt(ValueMinute);
+        Result += ":";
+        Result += (ValueSec > 9) ? FString::FromInt(ValueSec) : FString("0") + FString::FromInt(ValueSec);
+
+        return (Result);
     }
 };

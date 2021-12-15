@@ -6,6 +6,7 @@
 #include "Game/AI/SkeletonCannon/Notifys/SpawnBulletAnimNotify.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "PPGameInstance.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogSkeletonCannonPawn, All, All);
 
@@ -15,28 +16,20 @@ ASkeletonCannonPawn::ASkeletonCannonPawn()
     // Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = false;
 
-    // Create root scene component
-    this->RootScene = CreateDefaultSubobject<USceneComponent>("Root Scene");
-    SetRootComponent(this->RootScene);
-
-    // Create Skeletal Cannon
-    this->SkeletalCannon = CreateDefaultSubobject<USkeletalMeshComponent>("Skeletal Cannon");
-    this->SkeletalCannon->SetupAttachment(this->RootScene);
-
     // Scene component for spawn bullet actor
     this->SceneSpawnBullet = CreateDefaultSubobject<USceneComponent>("Scene spawn bullet component");
-    this->SceneSpawnBullet->SetupAttachment(this->RootScene);
+    this->SceneSpawnBullet->SetupAttachment(GetRootComponent());
 }
 
 void ASkeletonCannonPawn::StopFireCannon()
 {
-    this->StateSkeletonCannon = EStateSkeletonCannon::Idle;
+    ChangeStateBrain(EStateBrain::Idle);
     GetWorldTimerManager().ClearTimer(this->TimerAnimFR);
 }
 
 void ASkeletonCannonPawn::StartFireCannon()
 {
-    this->StateSkeletonCannon = EStateSkeletonCannon::Reload;
+    ChangeStateBrain(EStateBrain::Reload);
     GetWorld()->GetTimerManager().SetTimer(this->TimerAnimFR, this, &ASkeletonCannonPawn::SwapAnimState, this->TimeRateReload, false);
 }
 
@@ -44,58 +37,66 @@ void ASkeletonCannonPawn::StartFireCannon()
 void ASkeletonCannonPawn::BeginPlay()
 {
     Super::BeginPlay();
-    checkf(this->RootScene, TEXT("Root scene is nullptr"));
-    checkf(this->SkeletalCannon, TEXT("Skeletal Cannon is nullptr"));
 
+    // Spawn of the required number of cores
+    const FVector StartPos = this->SceneSpawnBullet->GetComponentLocation();
+    const FVector EndPos = StartPos + GetRootComponent()->GetRelativeRotation().Vector() * this->DistanceTrace;
+
+    if (this->bEnableDebugInfo)
+        DrawDebugLine(GetWorld(), StartPos, EndPos, this->ColorTrace, false, this->TimeLifeTrace, 0, this->ThicknessTrace);
+
+    this->DirectionShot = (EndPos - StartPos).GetSafeNormal();
+
+    // Settings for calling swap animations
     this->TimeRateFire /= this->AnimShoot->RateScale;
     this->TimeRateReload /= this->AnimReload->RateScale;
-    this->StateSkeletonCannon = EStateSkeletonCannon::Reload;
 
-    GetWorld()->GetTimerManager().SetTimer(this->TimerAnimFR, this, &ASkeletonCannonPawn::SwapAnimState, this->TimeRateReload, false);
-
-    const auto ListNotifyes = this->AnimShoot->Notifies;
-    for (auto TempClassNotify : ListNotifyes)
+    // Caption for the animated shot notification
+    const auto ListNotifies = this->AnimShoot->Notifies;
+    for (const auto TempClassNotify : ListNotifies)
     {
-        auto CastNotify = Cast<USpawnBulletAnimNotify>(TempClassNotify.Notify);
+        const auto CastNotify = Cast<USpawnBulletAnimNotify>(TempClassNotify.Notify);
         if (CastNotify)
         {
+            UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Name skeleton: %s | Name notify to cast: %s"), *GetName(), *CastNotify->GetName());
             CastNotify->OnSpawnBulletAnimNotify.AddUObject(this, &ASkeletonCannonPawn::SpawnBulletFromNotify);
         }
     }
+
+    // Test Spawning cannon
+    if (GetPPGameInstance()->GetRunLevel() == 28) this->SpawnBulletFromNotify();
 }
 
 void ASkeletonCannonPawn::SwapAnimState()
 {
     GetWorld()->GetTimerManager().ClearTimer(this->TimerAnimFR);
-    this->StateSkeletonCannon =
-        (this->StateSkeletonCannon == EStateSkeletonCannon::Fire) ? EStateSkeletonCannon::Reload : EStateSkeletonCannon::Fire;
-    UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Swap state to %s"), *UEnum::GetValueAsString(this->StateSkeletonCannon));
-    float TempRate = (this->StateSkeletonCannon == EStateSkeletonCannon::Fire) ? this->TimeRateFire : this->TimeRateReload;
+
+    ChangeStateBrain((GetStateBrain() == EStateBrain::Fire) ? EStateBrain::Reload : EStateBrain::Fire);
+    UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Name skeleton: %s | Swap state to %s"), *GetName(),
+        *UEnum::GetValueAsString(GetStateBrain()));
+
+    const float TempRate = (GetStateBrain() == EStateBrain::Fire) ? this->TimeRateFire : this->TimeRateReload;
     GetWorld()->GetTimerManager().SetTimer(this->TimerAnimFR, this, &ASkeletonCannonPawn::SwapAnimState, TempRate, false);
 }
 
 void ASkeletonCannonPawn::SpawnBulletFromNotify()
 {
-    FVector StartPos = this->SceneSpawnBullet->GetComponentLocation();
-    FVector EndPos = StartPos + this->RootScene->GetRelativeRotation().Vector() * this->DistanceTrace;
+    FTransform TempTransform;
+    TempTransform.SetLocation(this->SceneSpawnBullet->GetComponentLocation());
+    TempTransform.SetRotation(FQuat(0.0f, 0.0f, 0.0f, 0.0f));
+    TempTransform.SetScale3D(FVector(1.0f));
 
-    if (this->bEnableDebugTrace)
-        DrawDebugLine(GetWorld(), StartPos, EndPos, this->ColorTrace, false, this->LifeTimeTrace, 0, this->RateThickness);
-
-    const FVector Direction = (EndPos - StartPos).GetSafeNormal();
-
-    FTransform SpawnTransform;
-    SpawnTransform.SetLocation(StartPos);
-    SpawnTransform.SetRotation(FQuat(FRotator::ZeroRotator));
-    SpawnTransform.SetScale3D(FVector(1.f));
-    ABulletActor* TempBullet = GetWorld()->SpawnActorDeferred<ABulletActor>(this->RefBulletClass, SpawnTransform);
-    if (TempBullet)
+    ABulletActor* TempBullet = GetWorld()->SpawnActorDeferred<ABulletActor>(this->RefBulletClass, TempTransform);
+    if (!TempBullet)
     {
-        TempBullet->SetShotDirection(Direction);
-        TempBullet->FinishSpawning(SpawnTransform);
-        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-            GetWorld(), this->EffectShot, this->SceneSpawnBullet->GetComponentLocation(), FRotator(0.f, 0.f, -90.f));
-        UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Skeleton Cannon: %s | Bullet: %s | Location: %s | is spawning"), *GetName(),
-            *TempBullet->GetName(), *SpawnTransform.GetLocation().ToString());
+        UE_LOG(LogSkeletonCannonPawn, Error, TEXT("Skeleton cannon: %s | spawn bullet is nullptr"), *GetName());
+        return;
     }
+
+    TempBullet->SetActorLocation(this->SceneSpawnBullet->GetComponentLocation());
+    TempBullet->SetShotDirection(this->DirectionShot);
+    TempBullet->FinishSpawning(TempTransform);
+
+    UE_LOG(LogSkeletonCannonPawn, Display, TEXT("Skeleton Cannon: %s | Bullet: %s | Location: %s | is spawning"), *GetName(),
+        *TempBullet->GetName(), *TempBullet->GetActorLocation().ToString());
 }

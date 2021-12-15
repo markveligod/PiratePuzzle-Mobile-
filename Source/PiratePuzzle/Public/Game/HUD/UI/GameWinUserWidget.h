@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Game/GameDataTypes.h"
 #include "Game/HUD/UI/BaseUserWidget.h"
 #include "GameWinUserWidget.generated.h"
 
@@ -21,9 +22,8 @@ protected:
 
 private:
     // Image of a gold coin
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Widget",
-        meta = (AllowPrivateAccess = true, ToolTip = "Image of a gold coin"));
-    UTexture2D* GoldTexture;
+    UPROPERTY(EditDefaultsOnly, Category = "Settings Widget");
+    TAssetPtr<UTexture2D> GoldTexture;
     // Texture size image of a gold coin
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Widget",
         meta = (AllowPrivateAccess = true, ToolTip = "Texture size image of a gold coin"));
@@ -41,10 +41,39 @@ private:
     UPROPERTY(Transient, meta = (BindWidget))
     UImage* CoinThreeImage;
 
+    // Home button and Anim
+    UPROPERTY(Transient, meta = (BindWidget))
+    UButton* HomeButton;
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* HomeButtonAnim;
+
+    // Home button and Anim
+    UPROPERTY(Transient, meta = (BindWidget))
+    UButton* NextLevelButton;
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* NextLevelButtonAnim;
+
+    // Image coin button and Anim
+    UPROPERTY(Transient, meta = (BindWidget))
+    UImage* OpenCoinImage;
+    UPROPERTY(Transient, meta = (BindWidgetAnim))
+    UWidgetAnimation* ImageCoinAnim;
+
     // Restart game
     UFUNCTION()
     void OnClickedRestart();
 
     // Function for tracking coin changes
     void ChangeCountCoin(int32 CountCoin);
+
+    // Home
+    UFUNCTION()
+    void OnClickedHome();
+
+    // Next level
+    UFUNCTION()
+    void OnClickedNextLevel();
+
+    // Game state
+    void OnChangeGameState(EGameState NewGameState);
 };

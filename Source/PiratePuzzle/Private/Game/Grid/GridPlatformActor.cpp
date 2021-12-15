@@ -8,14 +8,17 @@
 AGridPlatformActor::AGridPlatformActor()
 {
     // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = false;
     // Create Scene Static Mesh for group
     this->SceneRoot = CreateDefaultSubobject<USceneComponent>("Scene Root");
     SetRootComponent(this->SceneRoot);
 
     // Create Static Mesh component
-    this->StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("Static Mesh Component");
-    this->StaticMeshComponent->SetupAttachment(this->SceneRoot);
+    this->BaseMeshPlatform = CreateDefaultSubobject<UStaticMeshComponent>("Static Mesh Component");
+    this->BaseMeshPlatform->SetupAttachment(this->SceneRoot);
+    this->BaseMeshPlatform->SetCollisionObjectType(ECC_WorldStatic);
+    this->BaseMeshPlatform->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    this->BaseMeshPlatform->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 
     // Create Debug Text Render
     this->TextDebugPosition = CreateDefaultSubobject<UTextRenderComponent>("Text Debug");
@@ -28,10 +31,5 @@ void AGridPlatformActor::BeginPlay()
     Super::BeginPlay();
     this->TextDebugPosition->DestroyComponent();
     this->GameMode = Cast<AGamePlayMode>(GetWorld()->GetAuthGameMode());
-}
-
-// Called every frame
-void AGridPlatformActor::Tick(float DeltaTime)
-{
-    Super::Tick(DeltaTime);
+    checkf(this->GameMode, TEXT("Game mode is nullptr"));
 }

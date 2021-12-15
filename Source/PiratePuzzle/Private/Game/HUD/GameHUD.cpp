@@ -2,30 +2,41 @@
 
 #include "Game/HUD/GameHUD.h"
 #include "Game/GamePlayMode.h"
-#include "Game/AI/Pirate/PirateAICharacter.h"
-#include "Game/AI/SkeletonRunner/SkeletonRunnerCharacter.h"
+#include "Game/AI/Pirate/PiratePawn.h"
+#include "Game/AI/SkeletonRunner/SkeletonRunnerPawn.h"
 #include "Game/Camera/CameraPawn.h"
 #include "Game/Grid/GridGeneratorActor.h"
 #include "Game/HUD/UI/BaseUserWidget.h"
+#include "GameFramework/GameUserSettings.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGameHUD, All, All);
 
 void AGameHUD::DrawHUD()
 {
     Super::DrawHUD();
+
+#if !UE_BUILD_SHIPPING
     ACameraPawn* CameraPawn = Cast<ACameraPawn>(GetOwningPawn());
 
     if (this->GameMode && EnableDebugHUD)
     {
         AddText(TEXT("----------Game Mode----------"), FText::FromString(""));
+        AddText(TEXT("Current run level:"), FText::FromString(UGameplayStatics::GetCurrentLevelName(GetWorld())));
         AddText(TEXT("Game play state:"), FText::FromString(UEnum::GetValueAsString(this->GameMode->GetGameState())));
+        AddInt(TEXT("Current coins pickup:"), this->GameMode->GetCountCoin());
+        AddInt(TEXT("Max count FPS:"), this->GameMode->MaxCountFPS);
+        AddInt(TEXT("Current Render Qualities:"), this->GameMode->GameSettings->GetOverallScalabilityLevel());
     }
 
-    if (CameraPawn && CameraPawn->AIPlayer && EnableDebugHUD)
+    if (CameraPawn && CameraPawn->AIPirate && EnableDebugHUD)
     {
         AddText(TEXT("----------Pirate Data----------"), FText::FromString(""));
-        AddText(TEXT("Current pirate state:"), FText::FromString(UEnum::GetValueAsString(CameraPawn->AIPlayer->GetStateAI())));
-        AddText(TEXT("Current Position:"), FText::FromString(CameraPawn->AIPlayer->GetPosPlayer().ToString()));
+        AddText(TEXT("Current pirate state:"), FText::FromString(UEnum::GetValueAsString(CameraPawn->AIPirate->GetStateBrain())));
+        AddText(TEXT("Current Point Position:"), FText::FromString(CameraPawn->AIPirate->GetPointPosition().ToString()));
+        AddText(TEXT("Current Direction:"), FText::FromString(UEnum::GetValueAsString(CameraPawn->DirectionPlayer)));
+        AddText(TEXT("Start Touch on screen:"), FText::FromString(CameraPawn->StartTouch.ToString()));
+        AddText(TEXT("End Touch on screen:"), FText::FromString(CameraPawn->EndTouch.ToString()));
     }
 
     if (this->GameMode && EnableDebugHUD)
@@ -34,11 +45,11 @@ void AGameHUD::DrawHUD()
         for (int32 i = 0; i < ArrayPointerSkeletons.Num(); i++)
         {
             AddText(TEXT("----------Skeleton Runner----------"), FText::FromString("#" + FString::FromInt(i)));
-            AddText(TEXT("Current Skeleton state:"),
-                FText::FromString(UEnum::GetValueAsString(ArrayPointerSkeletons[i]->GetStateAISkeletonRunner())));
+            AddText(TEXT("Current Skeleton state:"), FText::FromString(UEnum::GetValueAsString(ArrayPointerSkeletons[i]->GetStateBrain())));
             AddText(TEXT("Current Position:"), FText::FromString(ArrayPointerSkeletons[i]->GetPositionSkeleton().ToString()));
         }
     }
+#endif
 }
 
 void AGameHUD::BeginPlay()
@@ -63,6 +74,7 @@ void AGameHUD::BeginPlay()
     this->GameWidgets.Add(EGameState::GameWin, CreateWidget<UBaseUserWidget>(GetWorld(), this->GameWinWidgetClass));
     this->GameWidgets.Add(EGameState::GameOver, CreateWidget<UBaseUserWidget>(GetWorld(), this->GameOverWidgetClass));
     this->GameWidgets.Add(EGameState::Loading, CreateWidget<UBaseUserWidget>(GetWorld(), this->LoadingWidgetClass));
+    this->GameWidgets.Add(EGameState::AdsSkill, CreateWidget<UBaseUserWidget>(GetWorld(), this->AdsCountWidgetClass));
 
     // Set Hidden and add to viewport
     for (const auto Widget : this->GameWidgets)

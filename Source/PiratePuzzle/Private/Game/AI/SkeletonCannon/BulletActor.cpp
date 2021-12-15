@@ -2,8 +2,7 @@
 
 #include "Game/AI/SkeletonCannon/BulletActor.h"
 #include "Game/GamePlayMode.h"
-#include "Game/AI/Pirate/PirateAICharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "Game/AI/Pirate/PiratePawn.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
@@ -27,10 +26,17 @@ ABulletActor::ABulletActor()
 
     // Create projectile movement component
     this->ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("Projectile movement component");
+    this->ProjectileMovement->ProjectileGravityScale = 0.0f;
+    this->ProjectileMovement->InitialSpeed = 500.0f;
 
     // Create effect projectile
     this->EffectProjectile = CreateDefaultSubobject<UNiagaraComponent>("Effect projectile");
     this->EffectProjectile->SetupAttachment(this->SceneRoot);
+}
+
+void ABulletActor::SetShotDirection(FVector NormalDirection)
+{
+    this->ProjectileMovement->Velocity = NormalDirection * this->ProjectileMovement->InitialSpeed;
 }
 
 // Called when the game starts or when spawned
@@ -40,17 +46,15 @@ void ABulletActor::BeginPlay()
     checkf(this->SceneRoot, TEXT("Scene root is nullptr"));
     checkf(this->StaticMeshBullet, TEXT("Static Mesh Bullet"));
     checkf(this->ProjectileMovement, TEXT("Projectile movement component is nullptr"));
-    this->StaticMeshBullet->OnComponentBeginOverlap.AddDynamic(this, &ABulletActor::OnRegisterCollisionBeginOverlap);
-    this->ProjectileMovement->Velocity = this->DirectionBullet * this->ProjectileMovement->InitialSpeed;
-    SetLifeSpan(this->RateLifeTimeBullet);
 
     this->GameMode = Cast<AGamePlayMode>(GetWorld()->GetAuthGameMode());
     checkf(this->GameMode, TEXT("Game mode is nullptr"));
+    SetLifeSpan(this->RateLifeTimeBullet);
 }
 
-void ABulletActor::OnRegisterCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ABulletActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
+    Super::NotifyActorBeginOverlap(OtherActor);
     if (!OtherActor)
     {
         UE_LOG(LogBulletActor, Warning, TEXT("Call Register without param OtherActor"));
@@ -58,15 +62,13 @@ void ABulletActor::OnRegisterCollisionBeginOverlap(UPrimitiveComponent* Overlapp
     }
     UE_LOG(LogBulletActor, Display, TEXT("Bullet: %s overlap other actor: %s"), *GetName(), *OtherActor->GetName());
 
-    if (OtherActor->IsA(APirateAICharacter::StaticClass()))
+    if (OtherActor->IsA(APiratePawn::StaticClass()))
     {
-        APirateAICharacter* AIPirate = Cast<APirateAICharacter>(OtherActor);
-        AIPirate->SetStateAI(EStateAI::Death);
-        AIPirate->GetCharacterMovement()->StopActiveMovement();
-        this->GameMode->OnChangeGameStateTimer(EGameState::GameOver);
+        APiratePawn* AIPirate = Cast<APiratePawn>(OtherActor);
+        AIPirate->StopMovement();
+        AIPirate->ChangeStateBrain(EStateBrain::FellCannon);
+        this->GameMode->OnChangeGameStateTimer(EGameState::GameOver, 1.f);
     }
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), this->EffectDestroy, GetActorLocation());
-    this->StaticMeshBullet->SetVisibility(false);
-    this->ProjectileMovement->Velocity = FVector::ZeroVector;
-    SetLifeSpan(0.5f);
+    Destroy();
 }

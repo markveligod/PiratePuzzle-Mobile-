@@ -1,39 +1,30 @@
 ﻿#pragma once
 
+#include "Game/GameDataTypes.h"
 #include "AIDataTypes.generated.h"
 
 // A special state for a skeleton with a cannon
 UENUM(BlueprintType)
-enum class EStateSkeletonCannon : uint8
-{
-    None = 0,
-    Fire,
-    Reload,
-    Win,
-    Lose,
-    Idle
-};
-
-// State player ai character
-UENUM(BlueprintType)
-enum class EStateAI : uint8
+enum class EStateBrain : uint8
 {
     None = 0,
     Idle,
     Walk,
-    Death,
-    DeathSand,
+    Sand,
+    FellCannon,
+    FellSkeleton,
+    Lose,
     Win,
-    Attack
+    Attack,
+    Fire,
+    Reload
 };
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FDelegateChangeFinalAnim, EStateAI);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnStateBrainChangedSignature, EStateBrain)
 
-// A set of parameters for spawning a runner's skeleton
-class ASkeletonRunnerCharacter;
+    // A set of parameters for spawning a runner's skeleton
 
-USTRUCT(BlueprintType)
-struct FInfoSpawnSkeletonRunner
+    USTRUCT(BlueprintType) struct FInfoSpawnSkeletonRunner
 {
     GENERATED_BODY()
 
@@ -47,11 +38,18 @@ struct FInfoSpawnSkeletonRunner
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta = (ToolTip = "Turn the runner's skeleton before the start of the game."))
     float RotAxisZ = 0.f;
 
+    // Range reset timer to walk
+    UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta = (ToolTip = "Range reset timer to walk."))
+    FIntervalFloat RangeStopMove;
+
     FInfoSpawnSkeletonRunner() {}
-    FInfoSpawnSkeletonRunner(const FInfoSpawnSkeletonRunner& Other)
+    FInfoSpawnSkeletonRunner(const FInfoSpawnSkeletonRunner& Other) { *this = Other; }
+
+    void operator=(const FInfoSpawnSkeletonRunner& Other)
     {
         this->SpawnLocation = Other.SpawnLocation;
         this->RoadRoute = Other.RoadRoute;
         this->RotAxisZ = Other.RotAxisZ;
+        this->RangeStopMove = Other.RangeStopMove;
     }
 };

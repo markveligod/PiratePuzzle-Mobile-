@@ -7,6 +7,7 @@
 #include "MenuDataTypes.h"
 #include "GameMenuMode.generated.h"
 
+class UPPGameInstance;
 /**
  *
  */
@@ -35,4 +36,7 @@ protected:
 private:
     // Current status of the menu
     EMenuState MenuState = EMenuState::None;
+
+    // Pointer of class UPPGameInstance
+    UPPGameInstance* GameInstance;
 };

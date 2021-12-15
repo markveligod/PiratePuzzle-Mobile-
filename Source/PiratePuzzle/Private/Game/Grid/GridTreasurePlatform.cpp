@@ -3,8 +3,7 @@
 #include "Game/Grid/GridTreasurePlatform.h"
 #include "Components/BoxComponent.h"
 #include "Game/GamePlayMode.h"
-#include "Game/AI/Pirate/PirateAICharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "Game/AI/Pirate/PiratePawn.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogGridTreasurePlatform, All, All);
 
@@ -32,11 +31,11 @@ void AGridTreasurePlatform::RegisterCollisionOverlap(UPrimitiveComponent* Overla
     }
     UE_LOG(LogGridTreasurePlatform, Display, TEXT("Name Platform: %s | Position: %s | Name Actor overlap: %s"), *GetName(),
         *GetPositionPlatform().ToString(), *OtherActor->GetName());
-    if (OtherActor->IsA(APirateAICharacter::StaticClass()))
+    if (OtherActor->IsA(APiratePawn::StaticClass()))
     {
-        APirateAICharacter* AIPirate = Cast<APirateAICharacter>(OtherActor);
-        AIPirate->SetStateAI(EStateAI::Win);
-        AIPirate->GetCharacterMovement()->StopActiveMovement();
+        APiratePawn* AIPirate = Cast<APiratePawn>(OtherActor);
+        AIPirate->StopMovement();
+        AIPirate->ChangeStateBrain(EStateBrain::Win);
         AIPirate->SetActorLocation(this->BoxCollision->GetComponentLocation());
         GetGamePlayMode()->OnChangeGameStateTimer(EGameState::GameWin);
     }

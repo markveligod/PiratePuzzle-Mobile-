@@ -25,10 +25,12 @@ protected:
 
 private:
     // Game mode pointer
+    UPROPERTY()
     AGamePlayMode* GameMode = nullptr;
 
     // Map for storing all widgets
     TMap<EGameState, UBaseUserWidget*> GameWidgets;
+    UPROPERTY()
     UBaseUserWidget* WidgetOnVisible = nullptr;
 
     // A set of widgets that will be used to switch between level states on a delegate call
@@ -50,6 +52,9 @@ private:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI",
         meta = (AllowPrivateAccess = "true", ToolTip = "Loading widget UI from UBaseUserWidget"))
     TSubclassOf<UBaseUserWidget> LoadingWidgetClass;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI",
+        meta = (AllowPrivateAccess = "true", ToolTip = "Ads count widget UI from UBaseUserWidget"))
+    TSubclassOf<UBaseUserWidget> AdsCountWidgetClass;
 
     // Callback function for changing widgets depending on the game state
     void OnChangeGameState(EGameState NewState);

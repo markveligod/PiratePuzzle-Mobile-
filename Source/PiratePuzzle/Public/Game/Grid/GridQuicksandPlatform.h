@@ -6,6 +6,7 @@
 #include "Game/Grid/GridPlatformActor.h"
 #include "GridQuicksandPlatform.generated.h"
 
+class APiratePawn;
 class UNiagaraComponent;
 class APirateAICharacter;
 class UBoxComponent;
@@ -39,9 +40,10 @@ private:
     // To what depth to immerse on axis Z
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Sand",
         meta = (AllowPrivateAccess = "true", ToolTip = "To what depth to immerse on axis Z."))
-    float Depth = 100.f;
+    float Depth = 150.f;
 
-    AActor* SuicideBomber;
+    UPROPERTY()
+    APiratePawn* SuicideBomber;
     bool bEnableDepth = false;
     float TimeElyps = 0.f;
     float StartPos;

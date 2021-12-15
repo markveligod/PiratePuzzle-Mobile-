@@ -19,5 +19,5 @@ public:
     FOnSpawnBulletAnimNotifySignature OnSpawnBulletAnimNotify;
 
 protected:
-    virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation);
+    virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };

@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Game/GameDataTypes.h"
 #include "BaseUserWidget.generated.h"
 
+class USoundCue;
+class UPPGameInstance;
 class AGamePlayMode;
 /**
  *
@@ -22,6 +23,11 @@ public:
     void ShowAnim(UWidgetAnimation* Anim);
     // Play the animation with Timer
     void ShowAnimTimer(UWidgetAnimation* Anim, float RateTime);
+
+    // Open level
+    void OpenLevel(FName NameLevel);
+    // Open level for Timer
+    void OpenLevelTimer(FName NameLevel, float RateTime);
 
     // Getting start and end animation rate time
     float GetRateTimeStartAnim() const { return (this->RateTimeStartAnim); }
@@ -42,6 +48,14 @@ public:
     // State Active button
     bool GetStateActiveButton() const { return (this->bIsButtonActive); }
 
+    // Play sound cue
+    UFUNCTION(BlueprintCallable, Category = "BaseUserWidget")
+    void PlaySoundCue(USoundCue* PlaySound);
+
+    // Play sound cue on timer
+    UFUNCTION(BlueprintCallable, Category = "BaseUserWidget")
+    void PlaySoundCueTimer(USoundCue* PlaySound, float RateTime);
+
 protected:
     // required animations for all child classes Start and End animation
     UPROPERTY(Transient, meta = (BindWidgetAnim))
@@ -51,9 +65,14 @@ protected:
 
     // Init
     virtual void NativeOnInitialized() override;
+
     // Getting Current Game mode
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "BaseUserWidget")
     AGamePlayMode* GetGamePlayMode() const { return (this->GamePlayMode); }
+
+    // Getting Current Game instance
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "BaseUserWidget")
+    UPPGameInstance* GetPPGameInstance() const { return (this->PPGameInstance); }
 
     // Close button delay before change game state
     UPROPERTY(
@@ -69,6 +88,9 @@ private:
 
     // Pointer on Current class AGamePlayMode
     AGamePlayMode* GamePlayMode;
+
+    // Pointer on Current class UPPGameInstance
+    UPPGameInstance* PPGameInstance;
 
     // Mandatory setting of the exact time animation playback Start and End
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Settings Anim",

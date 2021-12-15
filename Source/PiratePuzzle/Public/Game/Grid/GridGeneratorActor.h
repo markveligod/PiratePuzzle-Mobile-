@@ -7,14 +7,14 @@
 #include "Game/AI/AIDataTypes.h"
 #include "GridGeneratorActor.generated.h"
 
+class APiratePawn;
 class AGridTreasurePlatform;
 class AGridQuicksandPlatform;
 class AGridNeutralPlatform;
 class AGridBarrierPlatform;
 class AGridWallActor;
 class AGridPlatformActor;
-class APirateAICharacter;
-class ASkeletonRunnerCharacter;
+class ASkeletonRunnerPawn;
 class AGoldActor;
 UCLASS()
 class PIRATEPUZZLE_API AGridGeneratorActor : public AActor
@@ -29,7 +29,7 @@ public:
     const TMap<FIntPoint, AGridPlatformActor*>& GetMapPlatformOnGrid() const { return (this->MapPlatformsOnGrid); }
 
     // Getting array pointer skeleton runners
-    const TArray<ASkeletonRunnerCharacter*>& GetArraySkeletonRunners() const { return (this->ArraySkeletonRunners); }
+    const TArray<ASkeletonRunnerPawn*>& GetArraySkeletonRunners() const { return (this->ArraySkeletonRunners); }
 
     // Getting add Position on pirate in grid
     float GetPosPirateAxisZ() const { return (this->AddPiratePosZ); }
@@ -57,17 +57,16 @@ private:
         meta = (AllowPrivateAccess = "true", ToolTip = "Reference for mesh spawning"))
     TSubclassOf<AGridNeutralPlatform> SpawnNeutralPlatformRef;
     // Size grid
-    UPROPERTY(
-        EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform", meta = (AllowPrivateAccess = "true", ToolTip = "WidthCount"))
+    UPROPERTY(EditInstanceOnly, Category = "Spawn Platform", meta = (ToolTip = "WidthCount"))
     int32 WidthCount = 6;
-    UPROPERTY(
-        EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform", meta = (AllowPrivateAccess = "true", ToolTip = "HeightCount"))
+    UPROPERTY(EditInstanceOnly, Category = "Spawn Platform", meta = (ToolTip = "HeightCount"))
     int32 HeightCount = 6;
     // The distance between platforms when spawning
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Platform",
         meta = (AllowPrivateAccess = "true", ToolTip = "The distance between platforms when spawning"))
     float DistancePlatform = 100.f;
     // Map Point and pointer spawn item on grid
+    UPROPERTY()
     TMap<FIntPoint, AGridPlatformActor*> MapPlatformsOnGrid;
 
     // Barrier pointer ref
@@ -117,7 +116,7 @@ private:
     // Pirate pointer ref
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
         meta = (AllowPrivateAccess = "true", ToolTip = "Pirate pointer ref"))
-    TSubclassOf<APirateAICharacter> SpawnPirateRef;
+    TSubclassOf<APiratePawn> SpawnPirateRef;
     // Pirate point position for Spawn on platform
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Pirate",
         meta = (AllowPrivateAccess = "true", ToolTip = "Pirate point position for Spawn on platform"))
@@ -131,15 +130,16 @@ private:
         meta = (AllowPrivateAccess = "true", ToolTip = "The angle of rotation when spawning a pirate"))
     float PirateRotZ = 0.f;
     // Pointer on pirate
-    APirateAICharacter* AIPirate;
+    UPROPERTY()
+    APiratePawn* AIPirate;
 
     /*
      * Part Settings for AI Skeleton runner
      */
-    // Pirate pointer ref
+    // ASkeletonRunnerPawn pointer ref
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Skeleton Runner",
         meta = (AllowPrivateAccess = "true", ToolTip = "Skeleton Runner pointer ref"))
-    TSubclassOf<ASkeletonRunnerCharacter> SpawnSkeletonRunnerRef;
+    TSubclassOf<ASkeletonRunnerPawn> SpawnSkeletonRunnerRef;
     // Array information for spawn Skeleton Runner
     UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Spawn Skeleton Runner",
         meta = (AllowPrivateAccess = "true", ToolTip = "Array information for spawn Skeleton Runner"))
@@ -149,7 +149,7 @@ private:
         meta = (AllowPrivateAccess = "true", ToolTip = "Adds along the Z axis when a Skeleton Runner spawn"))
     float AddSkeletonRunnerPosZ = 50.f;
     // Pointers on skeleton runners
-    TArray<ASkeletonRunnerCharacter*> ArraySkeletonRunners;
+    TArray<ASkeletonRunnerPawn*> ArraySkeletonRunners;
 
     /*
      * Part Settings for spawn Gold
